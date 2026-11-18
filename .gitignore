@@ -1,1 +1,6 @@
 build
+# Visual Studio temporary files
+.vs/
+
+# CMake build files
+out/
