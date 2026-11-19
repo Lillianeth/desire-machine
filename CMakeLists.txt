@@ -22,3 +22,6 @@ target_link_libraries(example PRIVATE raylib)
 # ==========================================================
 add_executable(main main.cpp Graphics.cpp)
 target_link_libraries(main PRIVATE raylib)
+
+add_executable(myFractal myFractal.cpp)
+target_link_libraries(myFractal PRIVATE raylib)
