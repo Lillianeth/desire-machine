@@ -16,11 +16,11 @@ int main() {
     int totalSlides = 5;
     // Texture researchImage = LoadTexture("cats-img.jpg");
     Texture researchImages[totalSlides] = {
-    LoadTexture("research-1.jpg"),
-    LoadTexture("research-2.jpg"),
-    LoadTexture("research-3.jpg"),
-    LoadTexture("research-4.jpg"),
-    LoadTexture("research-5.jpg")
+    LoadTexture("./images/research-1.jpg"),
+    LoadTexture("./images/research-2.jpg"),
+    LoadTexture("./images/research-3.jpg"),
+    LoadTexture("./images/research-4.jpg"),
+    LoadTexture("./images/research-5.jpg")
     };
     // asked gemini: how to load an image in raylib?
 

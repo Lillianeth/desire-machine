@@ -149,109 +149,6 @@ void Header(string section, string progress, Color accent) {
 	DrawLine(60, 88, 940, 88, PanelColor);
 }
 
-//---------lets put in practice recursion---------------------------
-void DrawBranches(float x, float y, float angle, float length, int remaining, int style) {
-	/*
-	Inspired by the official raylib example:
-	"shapes_recursive_tree"
-	Original example by Jopestpe (@jopestpe).
-	Source:
-	https://www.raylib.com/examples/shapes/loader.html?name=shapes_recursive_tree
-	This implementation uses recursion instead of
-	the iterative approach shown in the example.
-	Drawss a branch followed by its left and right brancches
-		parameters:
-			x,y: branch starting position
-			angle: direction in radians
-			length: length in pixels
-			remaining: levels left to draw
-			style: teal or lvander branch styles
-		returns
-			nothng
-	*/
-
-
-	//base case: an empty level has no branch and makes no more calls
-	//calls itself to create a branching tree
-
-    const int TealBranches = 0;
-    const int LavenderBranches = 1;
-
-	if (remaining <= 0) {
-		return;
-	}
-
-	Color accent = Teal;
-	if (style == LavenderBranches) {
-		accent = Lavender;
-	}
-
-	//calculating where the branch ends
-	Vector2 start = { x, y };
-	Vector2 tip = { x + length * cos(angle), y + length * sin(angle) };
-	float opacity = 0.9f;//90%
-	if (remaining == 1) {
-		opacity = 0.62f;//62%
-	}
-	DrawLineEx(start, tip, 1.2f + remaining * 0.37f, Fade(accent, opacity));
-	if (remaining == 1) {
-		DrawCircleV(tip, 2.2f, accent);
-	}
-
-	//both children start at the tip, hey turn in opposite directions and are shorter
-	float childLength = length * 0.74f;
-	//creates a branch angled toward one side
-	DrawBranches(tip.x, tip.y, angle - 0.55f, childLength, remaining - 1, style);
-	//creates a branch angled toward the other side
-	DrawBranches(tip.x, tip.y, angle + 0.55f, childLength, remaining - 1, style);
-	//B(d)=d^2 -1
-	//O(2^d)
-}
-
-void TreeCard(int depth, float y, Color accent, int style) {
-	/*
-		Draws the desire tree and its statistics inside a card
-		connects the recursive tree  with the actual GUI
-		parameters:
-			depth: levels to draw
-			y: top of the card,position where the card begins
-			accent: text color
-			style: teal or lavender branch style
-		returns:
-			noting
-	*/
-	//draw the card
-	Panel({ 60, y, 880, 228 });
-	//draw the title
-	int titleY = y + 30;
-	DrawText("THE DESIRE TREE", 88, titleY, 22, accent);
-	
-	int branches = BranchCount(depth);
-
-	//create the statistic text
-	string stats = "Depth " + to_string(depth);
-	stats += " / 7 | ";
-	stats += to_string(branches);
-	stats += " branch segments";
-
-	//draw the statistics
-	DrawText(stats.c_str(), 88, y + 71, 20, Ink);
-
-	//explain the branching process
-	Wrap("Each branch can produce two more. Depths 1, 2, and 3 draw 1, 3, and 7 segments.", 88, y + 110, 380, 17, Muted);
-	
-	//display the compexity
-	DrawText("Time O(2^depth)  |  Depth cap: 7", 88, y + 183, 17, Muted);
-	
-	//draw the recursive tree
-	DrawBranches(695, y + 205, -1.5708f, 57, depth, style);
-}
-
-
-
-
-
-
 //------------------------------------------------------------
 
 bool IsButtonClicked(Rectangle button) {
@@ -270,9 +167,9 @@ void DrawWelcomeScreen() {
     const int TealBranches = 0;
 
 	Panel({ 60, 65, 880, 634 });
-	DrawBranches(500, 235, -1.5708f, 36, 5, TealBranches);
+	// DrawBranches(500, 235, -1.5708f, 36, 5, TealBranches);
 	Center("HAPPINESS MACHINES", { 60, 256, 880, 82 }, 62, Ink);
-	Center("when will the infinite cycle of consumerism end?", { 60, 356, 880, 44 }, 24, Teal);
+	Center("Can technology make us happy, or keep us wanting more?", { 60, 356, 880, 44 }, 24, Teal);
 	Center("An interactive exhibit about technology, human desires,", { 60, 424, 880, 30 }, 21, Muted);
 	Center("consumer behavior, and commercial incentives.", { 60, 456, 880, 30 }, 21, Muted);
 	DrawButton(Explore, "START", Teal);
@@ -297,36 +194,61 @@ void DrawResearchScreen(int slide, Texture2D image) {
 
 	//draw the title and description using Wrap()
 	//wy 18?? because need an extra espace between the research title and the description
-	int bodyY = Wrap(content.title, 90, 142, 820, 37, Ink); //+18;
-	bodyY = 200;
-	Wrap(content.description, 90, bodyY, 810, 23, Muted);
+	int bodyY = Wrap(content.title, 90, 142, 820, 37, Ink);
+	bodyY += 18;
+
+	//draw the description and calculate where it ends
+	int descriptionEnd = Wrap(content.description, 90, bodyY, 810, 23, Muted);
 
 	//here im defininf the image area
-	Rectangle frame{ 90, 340, 820, 282 };
+	//the image position depends on how much space the description takes
+	int frameY = descriptionEnd + 18;
+
+	//keep the original position if there is enough space
+	if (frameY < 340) {
+		frameY = 340;
+	}
+
+	//the frame ends at the same position as before
+	int frameBottom = 622;
+	int frameHeight = frameBottom - frameY;
+
+	Rectangle frame{ 90, (float)frameY, 820, (float)frameHeight };
 	//frame= where the research image will appear.
 	DrawRectangleRounded(frame, 0.12f, 10, Navy);
 
 	//chek if whether the image loaded
-	if (IsTextureValid(image)) {
+	if (IsTextureValid(image) && frameHeight > 75) {
 		//resize the image without distorting its
-		float scale = 780.0f / image.width;
-		float heightScale = 224.0f / image.height;
+		float maxWidth = 780.0f;
+		float maxHeight = frameHeight - 65.0f;
+
+		float scale = maxWidth / image.width;
+		float heightScale = maxHeight / image.height;
+
 		if (heightScale < scale) {
 			scale = heightScale;
 		}
+
 		float w = image.width * scale;
 		float h = image.height * scale;
+
 		//draw the image using DrawTexturePro()
-		Rectangle source = { 0,0, (float)image.width, (float)image.height };
-		//500-w/2, 1000wide xceter = 500-> 500-400/2=300, start x=300,end x=700
-		Rectangle destination = { 500 - w / 2,463 - h / 2, w, h };
+		Rectangle source = { 0, 0, (float)image.width, (float)image.height };
+
+		//center the image inside the available frame
+		float imageCenterY = frameY + (frameHeight - 40) / 2.0f;
+		Rectangle destination = { 500 - w / 2, imageCenterY - h / 2, w, h };
+
 		Vector2 origin = { 0, 0 };
 		DrawTexturePro(image, source, destination, origin, 0, WHITE);
-		Center("Existing project image", { 90, 575, 820, 40 }, 16, Muted);
+
+		Center("sample text", { 90, (float)(frameBottom - 38), 820, 30 }, 16, Muted);
 	}
 	else {
 		Center("RESEARCH IMAGE PLACEHOLDER", frame, 20, Lavender);
 	}
+
 	//draw the navigation buttons
 	if (slide > 0) {
 		DrawButton(Previous, "PREVIOUS", Lavender);
@@ -465,20 +387,122 @@ void DrawResults(Values scores, vector<Decision> decisions, int offers) {
 
 */
 
-int BranchCount(int depth) {
-	/*
-		counts the branches level by level
-		parameters:
-			depth: number of levels to count
-		returns:
-			the total number of visible branches segments
-	*/
-	int segments = 0;
-	int branchesAtLevel = 1;
-	for (int level = 0; level < depth; level++) {
-		segments += branchesAtLevel;
-		//every branch has two children, so the next level is twice as wide
-		branchesAtLevel *= 2;
-	}
-	return segments;
-}
+// int BranchCount(int depth) {
+// 	/*
+// 		counts the branches level by level
+// 		parameters:
+// 			depth: number of levels to count
+// 		returns:
+// 			the total number of visible branches segments
+// 	*/
+// 	int segments = 0;
+// 	int branchesAtLevel = 1;
+// 	for (int level = 0; level < depth; level++) {
+// 		segments += branchesAtLevel;
+// 		//every branch has two children, so the next level is twice as wide
+// 		branchesAtLevel *= 2;
+// 	}
+// 	return segments;
+// }
+
+
+
+// //---------lets put in practice recursion---------------------------
+// void DrawBranches(float x, float y, float angle, float length, int remaining, int style) {
+// 	/*
+// 	Inspired by the official raylib example:
+// 	"shapes_recursive_tree"
+// 	Original example by Jopestpe (@jopestpe).
+// 	Source:
+// 	https://www.raylib.com/examples/shapes/loader.html?name=shapes_recursive_tree
+// 	This implementation uses recursion instead of
+// 	the iterative approach shown in the example.
+// 	Drawss a branch followed by its left and right brancches
+// 		parameters:
+// 			x,y: branch starting position
+// 			angle: direction in radians
+// 			length: length in pixels
+// 			remaining: levels left to draw
+// 			style: teal or lvander branch styles
+// 		returns
+// 			nothng
+// 	*/
+
+
+// 	//base case: an empty level has no branch and makes no more calls
+// 	//calls itself to create a branching tree
+
+//     const int TealBranches = 0;
+//     const int LavenderBranches = 1;
+
+// 	if (remaining <= 0) {
+// 		return;
+// 	}
+
+// 	Color accent = Teal;
+// 	if (style == LavenderBranches) {
+// 		accent = Lavender;
+// 	}
+
+// 	//calculating where the branch ends
+// 	Vector2 start = { x, y };
+// 	Vector2 tip = { x + length * cos(angle), y + length * sin(angle) };
+// 	float opacity = 0.9f;//90%
+// 	if (remaining == 1) {
+// 		opacity = 0.62f;//62%
+// 	}
+// 	DrawLineEx(start, tip, 1.2f + remaining * 0.37f, Fade(accent, opacity));
+// 	if (remaining == 1) {
+// 		DrawCircleV(tip, 2.2f, accent);
+// 	}
+
+// 	//both children start at the tip, hey turn in opposite directions and are shorter
+// 	float childLength = length * 0.74f;
+// 	//creates a branch angled toward one side
+// 	DrawBranches(tip.x, tip.y, angle - 0.55f, childLength, remaining - 1, style);
+// 	//creates a branch angled toward the other side
+// 	DrawBranches(tip.x, tip.y, angle + 0.55f, childLength, remaining - 1, style);
+// 	//B(d)=d^2 -1
+// 	//O(2^d)
+// }
+
+// void TreeCard(int depth, float y, Color accent, int style) {
+// 	/*
+// 		Draws the desire tree and its statistics inside a card
+// 		connects the recursive tree  with the actual GUI
+// 		parameters:
+// 			depth: levels to draw
+// 			y: top of the card,position where the card begins
+// 			accent: text color
+// 			style: teal or lavender branch style
+// 		returns:
+// 			noting
+// 	*/
+// 	//draw the card
+// 	Panel({ 60, y, 880, 228 });
+// 	//draw the title
+// 	int titleY = y + 30;
+// 	DrawText("THE DESIRE TREE", 88, titleY, 22, accent);
+	
+// 	int branches = BranchCount(depth);
+
+// 	//create the statistic text
+// 	string stats = "Depth " + to_string(depth);
+// 	stats += " / 7 | ";
+// 	stats += to_string(branches);
+// 	stats += " branch segments";
+
+// 	//draw the statistics
+// 	DrawText(stats.c_str(), 88, y + 71, 20, Ink);
+
+// 	//explain the branching process
+// 	Wrap("Each branch can produce two more. Depths 1, 2, and 3 draw 1, 3, and 7 segments.", 88, y + 110, 380, 17, Muted);
+	
+// 	//display the compexity
+// 	DrawText("Time O(2^depth)  |  Depth cap: 7", 88, y + 183, 17, Muted);
+	
+// 	//draw the recursive tree
+// 	DrawBranches(695, y + 205, -1.5708f, 57, depth, style);
+// }
+
+// */
