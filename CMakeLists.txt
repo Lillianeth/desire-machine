@@ -24,6 +24,7 @@ add_executable(hackathon
     main.cpp
     Graphics.cpp
     Research.cpp
+    HappinessMachine.cpp
 )
 target_link_libraries(hackathon PRIVATE raylib)
 

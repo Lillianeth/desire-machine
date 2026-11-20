@@ -11,6 +11,9 @@ const Color Lavender{ 196, 171, 245, 255 };
 const Color Ink{ 241, 246, 252, 255 };
 const Color Muted{ 179, 194, 215, 255 };
 
+const int TealBranches = 0;
+const int LavenderBranches = 1;
+
 //helper functions
 void Panel(Rectangle bounds) {
 	/*
@@ -340,7 +343,7 @@ void DrawResearchScreen(int slide, Texture2D image) {
 	}
 }
 
-/*
+
 void DrawExperiment(Scenario scenario, int completed, int depth) {
 	//also used my beloved helper functions to make it easier
 	//Scenario is a struct defined in HappinessMachine.h -->go and check
@@ -395,8 +398,8 @@ void DrawOffer(string product, string pitch, int offers, int depth) {
 	DrawText("FICTIONAL PRODUCT", 90, 147, 19, Lavender);
 
 	//draw the product name and description
-	const int bodyY = Wrap(product, 90, 189, 810, 40, Ink) + 12;
-	int bodyY = Wrap(product, 90, 189, 810, 40, Ink);
+	int bodyY = Wrap(product, 90, 189, 810, 40, Ink) + 12;
+	bodyY = Wrap(product, 90, 189, 810, 40, Ink);
 
 	bodyY += 12;
 
@@ -462,8 +465,6 @@ void DrawResults(Values scores, vector<Decision> decisions, int offers) {
 	DrawButton(Home, "BACK TO HOME", Muted);
 	DrawButton(Next, "RESTART EXPERIMENT", Teal);
 }
-
-*/
 
 int BranchCount(int depth) {
 	/*

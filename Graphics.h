@@ -2,7 +2,7 @@
 #define GRAPHICS_H
 
 #include "raylib.h"
-// #include "HappinessMachine.h"
+#include "HappinessMachine.h"
 #include "Research.h"
 #include <string>
 #include <vector>
@@ -42,7 +42,7 @@ void DrawResearchScreen(int slide, Texture2D image);
 	returns: noting
 */
 
-// void DrawExperiment(Scenario scenario, int completed, int depth);
+void DrawExperiment(Scenario scenario, int completed, int depth);
 /*
 	Draws the current scenario, progress, choices, and desir tree
 	parameters:

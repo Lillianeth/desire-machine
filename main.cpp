@@ -1,10 +1,32 @@
 #include <iostream>
 #include "raylib.h"
 #include "Graphics.h"
+#include "HappinessMachine.h"
 
 using namespace std;
 
+void LogTree(int depth) {
+    /*
+        displays info about the recursive tree in terminal
+        parameter:
+            depth: number of levels in the tree
+    */
+
+    //calculate the number of visible branches
+    int segments = BranchCount(depth);
+
+    //count all recursive calls, including the base cases
+    int calls = 2 * segments + 1;
+
+    cout << "Tree depth: " << depth << endl;
+    cout << "Branch segments: " << segments << endl;
+    cout << "Recursive calls: " << calls << endl;
+}
+
 int main() {
+
+    HappinessMachine machine;
+
     cout << "Hello CSC 103!" << endl;
     cout << "This is Team 1's Hackathon project!" << endl;
 
@@ -38,20 +60,62 @@ int main() {
             }
         }
 
-        else if (currentScreen == 1) { // enter in presentation mode and draw slides
+        else if (currentScreen == 1) {
+
             DrawResearchScreen(slide, researchImages[slide]);
 
             if (IsButtonClicked(Home)) {
                 currentScreen = 0;
                 slide = 0;
             }
-            else if (IsButtonClicked(Next) && slide < totalSlides - 1) { // slide < 4 because it's from 0 to 4 (5 slides total)
-                slide++;
-            }
             else if (IsButtonClicked(Previous) && slide > 0) {
                 slide--;
+            }
+            else if (IsButtonClicked(Next)) {
+
+                if (slide < totalSlides - 1) {
+                    slide++;
+                }
+                else {
+                    machine.Start();
+                    LogTree(machine.Depth());
+                    currentScreen = 2;
+                }
+            }
         }
-    }
+
+        else if (currentScreen == 2) {
+
+            DrawExperiment(
+                machine.GetCurrentScenario(),
+                machine.GetDecisionCount(),
+                machine.Depth()
+            );
+
+            //check whether the first choice was selected
+            if (IsButtonClicked(FirstChoice)) {
+
+                machine.Choose(true);
+
+                LogTree(machine.Depth());
+            }
+
+            //check whether the second choice was selected
+            else if (IsButtonClicked(SecondChoice)) {
+
+                machine.Choose(false);
+
+                LogTree(machine.Depth());
+            }
+
+            //after ten decisions, open the offers screen
+            if (machine.GetDecisionCount() == ScenarioCount) {
+
+                machine.Recommend();
+
+                currentScreen = 3;
+            }
+        }
 
         EndDrawing();
     }
