@@ -20,7 +20,7 @@ target_link_libraries(example PRIVATE raylib)
 #  Made a new class? Add its .cpp file to this list.
 #  (Don't list .h files, only .cpp files.)
 # ==========================================================
-add_executable(main main.cpp Graphics.cpp)
+add_executable(main main.cpp Graphics.cpp HappinessMachine.cpp Research.cpp)
 target_link_libraries(main PRIVATE raylib)
 
 add_executable(myFractal myFractal.cpp)
