@@ -13,7 +13,7 @@ public:
 };
 
 //number of research slides
-const int ResearchSlideCount = 3;
+const int ResearchSlideCount = 12;
 
 //gets the information for a slide
 ResearchSlide GetResearchSlide(int index);

@@ -1,0 +1,160 @@
+
+
+HAPPINESS MACHINES - RESEARCH AND PROJECT REFERENCES
+
+CSC 103
+
+TEAM 1
+
+Names: 
+Lillianeth Rivas
+Melvin Sch
+Tianne??
+
+------------ACADEMIC RESEARCH--------------------------
+
+1. Adomavicius, G., & Tuzhilin, A. (2005).
+   Toward the next generation of recommender systems:
+   A survey of the state-of-the-art and possible extensions.
+   IEEE Transactions on Knowledge and Data Engineering,
+   17(6), 734-749.
+   https://doi.org/10.1109/TKDE.2005.99
+
+2. Crawford, K., & Joler, V. (2023).
+   Calculating Empires: A genealogy of technology
+   and power since 1500.
+   https://calculatingempires.net/about.html
+
+3. Deterding, S., Dixon, D., Khaled, R., & Nacke, L. (2011).
+   From game design elements to gamefulness:
+   Defining "gamification."
+   Proceedings of the 15th International Academic
+   MindTrek Conference, 9-15.
+   https://doi.org/10.1145/2181037.2181040
+
+4. Federal Trade Commission. (2022).
+   Bringing dark patterns to light.
+   https://www.ftc.gov/reports/bringing-dark-patterns-light
+
+5. Mansoury, M., Abdollahpouri, H., Pechenizkiy, M.,
+   Mobasher, B., & Burke, R. (2020).
+   Feedback loop and bias amplification in
+   recommender systems.
+   Proceedings of the 29th ACM International Conference
+   on Information & Knowledge Management, 2145-2148.
+   https://doi.org/10.1145/3340531.3412152
+
+6. Mathur, A., Acar, G., Friedman, M. J.,
+   Lucherini, E., Mayer, J., Chetty, M., & Narayanan, A. (2019).
+   Dark patterns at scale: Findings from a crawl
+   of 11K shopping websites.
+   Proceedings of the ACM on Human-Computer Interaction,
+   3(CSCW), Article 81.
+   https://doi.org/10.1145/3359183
+
+7. Milano, S., Taddeo, M., & Floridi, L. (2020).
+   Recommender systems and their ethical challenges.
+   AI & Society, 35, 957-967.
+   https://doi.org/10.1007/s00146-020-00950-y
+
+8. Narayanan, A., & Kapoor, S. (2024).
+   AI snake oil: What artificial intelligence can do,
+   what it can't, and how to tell the difference.
+   Princeton University Press.
+   https://press.princeton.edu/books/hardcover/9780691249131/ai-snake-oil
+
+9. Nissenbaum, H. (2004).
+   Privacy as contextual integrity.
+   Washington Law Review, 79(1), 119-158.
+   https://digitalcommons.law.uw.edu/wlr/vol79/iss1/10/
+
+10. Ricci, F., Rokach, L., & Shapira, B. (Eds.). (2022).
+    Recommender systems handbook (3rd ed.).
+    Springer.
+    https://doi.org/10.1007/978-1-0716-2197-4
+
+11. Tabassi, E. (2023).
+    Artificial intelligence risk management framework
+    (AI RMF 1.0). NIST AI 100-1.
+    National Institute of Standards and Technology.
+    https://doi.org/10.6028/NIST.AI.100-1
+
+12. Zhang, Y., & Chen, X. (2020).
+    Explainable recommendation:
+    A survey and new perspectives.
+    Foundations and Trends in Information Retrieval,
+    14(1), 1-101.
+    https://doi.org/10.1561/1500000066
+
+13. Zuboff, S. (2019).
+    The age of surveillance capitalism:
+    The fight for a human future at the new
+    frontier of power.
+    PublicAffairs.
+
+------------------ADDITIONAL HISTORICAL SOURCES-----------------------------
+
+14. Hagley Museum and Library.
+    Ideas on motivating people with Ernest Dichter.
+    https://www.hagley.org/librarynews/ideas-motivating-people-ernest-dichter
+
+15. Lapham's Quarterly.
+    Selling short.
+    https://www.laphamsquarterly.org/happiness/miscellany/selling-short
+
+    Used for historical discussion of the expression
+    "happiness machines" attributed to Herbert Hoover.
+    The original wording and first usage are not verified.
+
+16. Bernays, E. L. (1928).
+    Propaganda.
+    Historical background on public relations
+    and the influence of public opinion.
+
+
+-------------IMAGE AND VISUAL REFERENCES--------------------------------
+
+17. Library of Congress.
+    Herbert Hoover, portrait (c. 1928).
+    Photograph by Underwood & Underwood.
+    https://www.loc.gov/pictures/item/2006683445/
+
+18. Crawford, K., & Joler, V. (2023).
+    Calculating Empires.
+    Source of the original Happiness Machines
+    research diagram.
+    https://calculatingempires.net/
+
+
+---------PROGRAMMING AND VISUALIZATION REFERENCES--------
+
+19. raylib.
+    Official examples and documentation.
+    https://www.raylib.com/examples.html
+
+20. raylib.
+    Recursive tree example.
+    https://www.raylib.com/examples/shapes/loader.html?name=shapes_recursive_tree
+
+21. Shiffman, D.
+    The Nature of Code - Fractals.
+    https://natureofcode.com/fractals/
+
+    Used as learning resources for understanding
+    recursive tree structures and branching patterns.
+
+------------------AI ASSISTANCE-------------------------------
+
+OpenAI ChatGPT was used as a learning and development
+assistant for explanations of C++ confusions and find
+problems in some code fucntions, each prompt is commented
+in the actual code to better clarity.
+
+The research, project implementation, source selection,
+and all related to this project  remain the team's 
+responsibility. 
+
+
+--------------END OF REFERENCES--------------------
+
+*/
