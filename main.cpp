@@ -1,96 +1,96 @@
-
-#include "Graphics.h"
 #include <iostream>
+#include "Graphics.h"
+#include "rlgl.h"
 #include <string>
-
 using namespace std;
 
-
-void LogTree(int depth) {
-    /*
-        displays info about the recursive tree in terminal
-        parameter:
-            depth: number of levels in the tree
-    */
-
-    //calculate the number of visible branches
-    int segments = BranchCount(depth);
-
-    //count all recursive calls, including the base cases
-    int calls = 2 * segments + 1;
-
-    cout << "Tree depth: " << depth << endl;
-    cout << "Branch segments: " << segments << endl;
-    cout << "Recursive calls: " << calls << endl;
-}
-
-//MAINN!!
 int main() {
 
-    //create the application window
-    SetConfigFlags(FLAG_MSAA_4X_HINT);
-    InitWindow(1000, 800, "Happiness Machines");
+    //original size of our gui
+    int gameWidth = 1400;
+    int gameHeight = 900;
+
+    //create the window
+    InitWindow(gameWidth, gameHeight, "Happiness Machines");
+
+    //get the monitor resolution
+    int screenWidth = GetMonitorWidth(0);
+    int screenHeight = GetMonitorHeight(0);
+
+    //make the window fullscreen
+    SetWindowSize(screenWidth, screenHeight);
+    ToggleFullscreen();
+
     SetTargetFPS(60);
 
+    //calculate how much we need to enlarge the gui
+    float scaleX = (float)GetScreenWidth() / gameWidth;
+    float scaleY = (float)GetScreenHeight() / gameHeight;
 
-    // --------LOAD RESEARCH IMAGES HERE! --------
+    //use the smaller scale to avoid stretching
+    float scale = scaleX;
 
+    if (scaleY < scaleX) {
+        scale = scaleY;
+    }
+
+    //calculate the space around our gui
+    int offsetX = (GetScreenWidth() - gameWidth * scale) / 2;
+    int offsetY = (GetScreenHeight() - gameHeight * scale) / 2;
+
+    //adjust the mouse coordinates for the new size
+    SetMouseOffset(-offsetX, -offsetY);
+    SetMouseScale(1.0f / scale, 1.0f / scale);
+
+    //load the research images
     Texture2D researchImages[ResearchSlideCount] = {};
 
-    string imageDirectory = GetApplicationDirectory();
-    imageDirectory += "img/";
+    //string imageDirectory = GetApplicationDirectory();
+    //location of our research images
+    string imageDirectory = "../../../img/";
+    cout << "Looking for images in: " << imageDirectory << endl;
 
     for (int i = 0; i < ResearchSlideCount; i++) {
 
-        //get the image filename for the current slide
         ResearchSlide research = GetResearchSlide(i);
         string imageName = research.image;
 
+        //check if this slide has an image
         if (imageName.size() > 0) {
 
             string path = imageDirectory + imageName;
 
-            //load the image only if the file exists
+            //load the image if the file exists
             if (FileExists(path.c_str())) {
                 researchImages[i] = LoadTexture(path.c_str());
             }
         }
     }
-
-    //-------- INITIAL VARIABLES --------
-
-    // 0 = Welcome
-    // 1 = Research
-    // 2 = Experiment
-    // 3 = Fictional Offers
-    // 4 = Results
+    //screens
+    //0 = welcome
+    //1 = research
+    //2 = experiment
+    //3 = offers
+    //4 = results
 
     int currentScreen = 0;
     int slide = 0;
 
-    //create an object from our HappinessMachine class
+    //create the happiness machine object
     HappinessMachine machine;
 
-
-    //-------- MAIN APPLICATION LOOP --------
-
+    //main loop
     while (!WindowShouldClose()) {
 
-
-        //-------- HANDLE USER INPUT --------
-
-        // WELCOME SCREEN
+        //welcome screen
         if (currentScreen == 0) {
 
             if (IsButtonClicked(Explore)) {
-
                 slide = 0;
                 currentScreen = 1;
             }
         }
-
-
-        //--------RESEARCH SCREEN
+        //research screen
         else if (currentScreen == 1) {
 
             if (IsButtonClicked(Home)) {
@@ -101,119 +101,83 @@ int main() {
             }
             else if (IsButtonClicked(Next)) {
 
-                //move to the next research slide
                 if (slide < ResearchSlideCount - 1) {
                     slide++;
                 }
                 else {
-
-                    //start the experiment after the last slide
                     machine.Start();
-
-                    LogTree(machine.Depth());
-
                     currentScreen = 2;
                 }
             }
         }
 
-
-        //---------EXPERIMENT SCREEN
+        //experiment screen
         else if (currentScreen == 2) {
 
-            //check whether the first choice was selected
+            //first choice
             if (IsButtonClicked(FirstChoice)) {
-
                 machine.Choose(true);
-
-                LogTree(machine.Depth());
             }
 
-            //check whether the second choice was selected
+            //second choice
             else if (IsButtonClicked(SecondChoice)) {
-
                 machine.Choose(false);
-
-                LogTree(machine.Depth());
             }
 
-            //after ten decisions, open the offers screen
+            //start the offers after ten decisions
             if (machine.GetDecisionCount() == ScenarioCount) {
-
                 machine.Recommend();
-
                 currentScreen = 3;
             }
         }
 
-
-        //-------------FICTIONAL OFFERS SCREEN
+        //offers screen
         else if (currentScreen == 3) {
 
-            //stop early and view the results
-            if (machine.GetOfferCount() < OfferLimit && IsButtonClicked(Home)) {
-
+            //stop and view results
+            if (IsButtonClicked(Home)) {
                 currentScreen = 4;
             }
-
-            //get another offer or finish the experiment
             else if (IsButtonClicked(Next)) {
 
                 if (machine.GetOfferCount() == OfferLimit) {
-
                     currentScreen = 4;
                 }
                 else {
-
                     machine.Recommend();
-
-                    LogTree(machine.Depth());
                 }
             }
         }
 
-
-        //--------------ESULTS SCREEN
+        //results screen
         else if (currentScreen == 4) {
 
-            //return to the welcome screen
             if (IsButtonClicked(Home)) {
-
                 currentScreen = 0;
             }
-
-            //restart the experiment
             else if (IsButtonClicked(Next)) {
-
                 machine.Start();
-
-                LogTree(machine.Depth());
-
                 currentScreen = 2;
             }
         }
-
-
-        //-------- DRAW THE CURRENT SCREEN --------
-
+        //draw the current screen
         BeginDrawing();
 
-        ClearBackground({ 15, 23, 42, 255 });
+        ClearBackground({ 121, 101, 155, 255 });
+
+        //move and enlarge the gui
+        rlPushMatrix();
+        rlTranslatef(offsetX, offsetY, 0);
+        rlScalef(scale, scale, 1.0f);
 
 
         if (currentScreen == 0) {
-
             DrawWelcomeScreen();
         }
         else if (currentScreen == 1) {
-
-            DrawResearchScreen(
-                slide,
-                researchImages[slide]
-            );
+            DrawResearchScreen(slide, researchImages[slide]);
         }
         else if (currentScreen == 2) {
-
             DrawExperiment(
                 machine.GetCurrentScenario(),
                 machine.GetDecisionCount(),
@@ -221,7 +185,6 @@ int main() {
             );
         }
         else if (currentScreen == 3) {
-
             DrawOffer(
                 machine.GetProduct(),
                 machine.GetPitch(),
@@ -230,7 +193,6 @@ int main() {
             );
         }
         else if (currentScreen == 4) {
-
             DrawResults(
                 machine.GetTotals(),
                 machine.GetDecisions(),
@@ -238,22 +200,21 @@ int main() {
             );
         }
 
+        //finish scaling the gui
+        rlPopMatrix();
+
         EndDrawing();
     }
-
-
-    //--------------RELEASE RESEARCH IMAGES --------
-
+    //unload the research images
     for (int i = 0; i < ResearchSlideCount; i++) {
 
         if (IsTextureValid(researchImages[i])) {
             UnloadTexture(researchImages[i]);
         }
     }
-
-
-    //close the application
+    //close the window
     CloseWindow();
 
     return 0;
 }
+

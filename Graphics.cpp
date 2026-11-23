@@ -1,484 +1,429 @@
 #include "Graphics.h"
 #include <cmath>
-
 using namespace std;
-//custom colors for the GUI, defined using raylib's color structure
-//{red, green, blue, alpha}
-const Color Navy{ 15, 23, 42, 255 };
-const Color PanelColor{ 25, 37, 58, 255 };
-const Color Teal{ 125, 231, 213, 255 };
-const Color Lavender{ 196, 171, 245, 255 };
-const Color Ink{ 241, 246, 252, 255 };
-const Color Muted{ 179, 194, 215, 255 };
 
+//colors for the application
+const Color Navy = { 121, 101, 155, 255 };   //background
+const Color PanelColor = { 67, 49, 94, 255 };   //dark panels
+const Color Teal = { 118, 255, 234, 255 };   //cyan titles/buttons
+const Color Lavender = { 255, 186, 138, 255 }; //peach/orange accent
+const Color Ink = { 241, 236, 245, 255 };  //main light text
+const Color Muted = { 220, 210, 230, 255 };  //secondary text
+const Color TreePink = { 255, 0, 255, 255 };  //tree branches
 
-const int TealBranches = 0;
-const int LavenderBranches = 1;
+class Branch {
+    /*this piece of code is inspired in the raylib example "recursive tree" created by Jopestpe
+    https://www.raylib.com/examples/shapes/loader.html?name=shapes_recursive_tree
 
-//declaration of the recursive tree function(function prototype)
-void DrawBranches(float x, float y, float angle,
-	float length, int remaining, int style);
+    also checked this resources:
+    https://natureofcode.com/fractals/#trees
+    https://www.youtube.com/watch?v=0jjeOYMjmDU
+
+    asked gemini:
+        how does drawlineex work in Raylib?
+        what is this formula doing: ...?
+        typedefs and classes are the same?
+        remind me how to apply recursion in c++
+        what is wrong with initializing global variables vs doing it in main?*/
+public:
+    Vector2 start;
+    Vector2 end;
+    float angle;
+    float length;
+};
+
+//tree settings
+const float branchDecay = 0.66f;
+const float branchAngle = 50.0f * DEG2RAD;
+
+//draws the branches using recursion
+void drawBranch(Branch branch, int currentDepth, int targetDepth) {
+    /*draws a fractal tree using recursion
+        parameters:
+            branch: current branch
+            currentDepth: current generation
+            targetDepth: number of generations to draw
+        returns:
+            nothing*/
+    //draw the current branch
+    DrawLineEx(branch.start, branch.end, 2.0f, MAGENTA);
+    // asked gemini: "how does drawlineex work in Raylib?"
+    //base case
+    if (currentDepth >= targetDepth) {
+        return;
+    }
+    //calculate the next branch length
+    float nextLength = branch.length * branchDecay;
+
+    //left branch
+    float angle1 = branch.angle + branchAngle;
+
+    Branch leftBranch;
+    leftBranch.start = branch.end;
+    leftBranch.angle = angle1;
+    leftBranch.length = nextLength;
+
+    leftBranch.end = {
+        branch.end.x + nextLength * sinf(angle1),
+        branch.end.y - nextLength * cosf(angle1)
+    };
+    //right branch
+    float angle2 = branch.angle - branchAngle;
+
+    Branch rightBranch;
+    rightBranch.start = branch.end;
+    rightBranch.angle = angle2;
+    rightBranch.length = nextLength;
+
+    rightBranch.end = {
+        branch.end.x + nextLength * sinf(angle2),
+        branch.end.y - nextLength * cosf(angle2)
+    };
+    //recursive calls
+    drawBranch(leftBranch, currentDepth + 1, targetDepth);
+    drawBranch(rightBranch, currentDepth + 1, targetDepth);
+}
+
+//draws the tree inside the right panel
+void DrawTree(int depth) {
+    /*creates the first branch and draws the entire tree
+        parameters:
+            depth: number of generations
+        returns:
+            nothing*/
+    Branch root;
+    //start near the bottom of the right panel
+    root.start = { 1105, 690 };
+    root.angle = 0.0f;
+    root.length = 145.0f;
+
+    //calculate the end of the first branch
+    root.end = {
+        root.start.x + root.length * sinf(root.angle),
+        root.start.y - root.length * cosf(root.angle)
+    }; // prompted gemini: "what is this formula doing: ...?"
+
+    //draw the tree
+    drawBranch(root, 0, depth);
+}
 
 //helper functions
-void Panel(Rectangle bounds) {
-	/*
-		Receives a rectangle containing position and size
-		bounds : deetermines where the card appears and how big it is
-	*/
-	DrawRectangleRounded(bounds, 0.12f, 12, PanelColor);
-}
-
-void Center(string text, Rectangle bounds, int size, Color color) {
-	/*
-		Centers text and reduces the font size when it needs more room.
-		parameters:
-			text: line to draw
-			bounds: area used for centering
-			size: starting font size
-			color: text color
-	*/
-	while (size > 12 && MeasureText(text.c_str(), size) > bounds.width - 24) {
-		//if the text is too wide, size-- reduces the font size by one 
-		// each time until it fits or reaches 12
-		size--;
-	}
-	int width = MeasureText(text.c_str(), size);
-	//text.c_str() converts the c++ string into the character-string format expected by raylib
-	int x = bounds.x + (bounds.width - width) / 2;//do i need to use static_cast here?
-	int y = bounds.y + (bounds.height - size) / 2;
-	//this display the text at the positions we calculated
-	DrawText(text.c_str(), x, y, size, color);
-}
-
-int Wrap(string text, int x, int y, int width, int size, Color color) {
-	/*
-		Draws each line within the given width. What this means?
-		automatically divides long text into multiple lines so it fits 
-		inside our GUI panels. I think this function is important
-		because we can put large text without caring about wrap each line
-		CHECK LATER IF WE REALLY NEEDED OR NOT TO DELETE THIS FUNCTION
-		parameters
-			text: words to draw for exp a complete paragraph
-			x, y : startinf positions
-			width: maximun line width
-			size: font size
-			color: text color
-
-		returns
-			it returns the Y coordinate after the last line, so we know where
-			to draw the next element without overlapping the paragraph
-	*/
-
-	//stores the words that currently fit on the same line
-	string line;
-	//stores the word currently being built, one character at a time
-	string word;
-
-	int textLength = text.size();
-	for (int i = 0; i <= textLength; i++) {
-		//<= extra iteration to now te word has ended 
-		char letter = ' ';
-		//to prevent accessing text.at(i) outside the string C A T _= 0 1 2 3-> 3<3? FALSE Is a space
-		if (i < textLength) {
-			letter = text.at(i);
-		}//i want happiness = w wa wan want
-		if (letter != ' ' && letter != '\n' && letter != '\t' && letter != '\r') {
-			word += letter;
-		}
-		//--------------it fit or not?-------------------------
-		else if (word.size()>0) {
-			if (line.size()==0) {
-				line = word;
-			}
-			else {
-				string nextLine = line + " " + word;
-				if (MeasureText(nextLine.c_str(), size ) > width) {
-					DrawText(line.c_str(), x, y, size, color);
-					y += size + 8;
-					line = word;
-				}
-				else {
-					line = nextLine;
-				}
-			}
-			word.clear();
-		}
-	}
-	DrawText(line.c_str(), x, y, size, color);
-	return y + size + 8;
-}
-
-void DrawButton(Rectangle button, string text, Color accent) {
-	/*
-		Draws a rounded button that highlights on hover
-		-the button changes appearance when the mouse moves over it
-		parameter:
-			button: button position and size
-			text: button label
-			accent: border and hover color
-		returns:
-			nothing
-	*/
-	bool hover = CheckCollisionPointRec(GetMousePosition(), button);
-	Color fill = PanelColor;
-	Color textColor = accent;
-	if (hover) {
-		fill = accent;
-		textColor = Navy;
-	}
-	//drawwing the actual button
-	DrawRectangleRounded(button, 0.24f, 10, fill);
-	DrawRectangleRoundedLinesEx(button, 0.24f, 10, 2, accent);
-
-	Center(text, button, 20, textColor);
-}
-
-void Header(string section, string progress, Color accent) {
-	/*
-		draw the heading at the top of each screen, display 
-		progress on the right, and add a separating line underneath
-		parameters:
-			section: screen heading
-			progress: text aligned on the right
-			accent: heading color
-		returns nothing
-		
-	*/
-	//the left heading
-	//DrawText(text, x, y, fontSize, color);
-	DrawText(section.c_str(), 60, 48, 21, accent);
-	//the right - aligned progress
-	//if mt=150 --> x = 940 - 150 = 790
-	int progressWidth = MeasureText(progress.c_str(), 18);
-	int progressX = 940 - progressWidth;
-	DrawText(progress.c_str(), progressX, 50, 18, Muted);
-	//separator, draws a line across the screen
-	//DrawLine(startX, startY, endX, endY, color);
-	DrawLine(60, 88, 940, 88, PanelColor);
-}
-
-void TreeCard(int depth, float y, Color accent, int style) {
-	/*
-		Draws the desire tree and its statistics inside a card
-		connects the recursive tree  with the actual GUI
-		parameters:
-			depth: levels to draw
-			y: top of the card,position where the card begins
-			accent: text color
-			style: teal or lavender branch style
-		returns:
-			noting
-	*/
-	//draw the card
-	Panel({ 60, y, 880, 228 });
-	//draw the title
-	int titleY = y + 30;
-	DrawText("THE DESIRE TREE", 88, titleY, 22, accent);
-	
-	int branches = BranchCount(depth);
-
-	//create the statistic text
-	string stats = "Depth " + to_string(depth);
-	stats += " / 7 | ";
-	stats += to_string(branches);
-	stats += " branch segments";
-
-	//draw the statistics
-	DrawText(stats.c_str(), 88, y + 71, 20, Ink);
-
-	//explain the branching process
-	Wrap("Each branch can produce two more. Depths 1, 2, and 3 draw 1, 3, and 7 segments.", 88, y + 110, 380, 17, Muted);
-	
-	//display the compexity
-	DrawText("Time O(2^depth)  |  Depth cap: 7", 88, y + 183, 17, Muted);
-	
-	//draw the recursive tree
-	DrawBranches(695, y + 205, -1.5708f, 57, depth, style);
-}
-
-
-//---------lets put in practice recursion---------------------------
-void DrawBranches(float x, float y, float angle, float length, int remaining, int style) {
-	/*
-	Inspired by the official raylib example:
-	"shapes_recursive_tree"
-	Original example by Jopestpe (@jopestpe).
-	Source:
-	https://www.raylib.com/examples/shapes/loader.html?name=shapes_recursive_tree
-	This implementation uses recursion instead of
-	the iterative approach shown in the example.
-	Drawss a branch followed by its left and right brancches
-		parameters:
-			x,y: branch starting position
-			angle: direction in radians
-			length: length in pixels
-			remaining: levels left to draw
-			style: teal or lvander branch styles
-		returns
-			nothng
-	*/
-
-
-	//base case: an empty level has no branch and makes no more calls
-	//calls itself to create a branching tree
-	if (remaining <= 0) {
-		return;
-	}
-
-	Color accent = Teal;
-	if (style == LavenderBranches) {
-		accent = Lavender;
-	}
-
-	//calculating where the branch ends
-	Vector2 start = { x, y };
-	Vector2 tip = { x + length * cos(angle), y + length * sin(angle) };
-	float opacity = 0.9f;//90%
-	if (remaining == 1) {
-		opacity = 0.62f;//62%
-	}
-	DrawLineEx(start, tip, 1.2f + remaining * 0.37f, Fade(accent, opacity));
-	if (remaining == 1) {
-		DrawCircleV(tip, 2.2f, accent);
-	}
-
-	//both children start at the tip, hey turn in opposite directions and are shorter
-	float childLength = length * 0.74f;
-	//creates a branch angled toward one side
-	DrawBranches(tip.x, tip.y, angle - 0.55f, childLength, remaining - 1, style);
-	//creates a branch angled toward the other side
-	DrawBranches(tip.x, tip.y, angle + 0.55f, childLength, remaining - 1, style);
-	//B(d)=d^2 -1
-	//O(2^d)
-}
-
-
-//------------------------------------------------------------
-
 bool IsButtonClicked(Rectangle button) {
-
-	if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT) &&
-		CheckCollisionPointRec(GetMousePosition(), button)) {
-
-		return true;
-	}
-
-	return false;
+    /*checks if the user clicked a button
+        parameters:
+            button: position and size of the button
+        returns:
+            true if clicked, otherwise false*/
+    if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
+        if (CheckCollisionPointRec(GetMousePosition(), button)) {
+            return true;
+        }
+    }
+    return false;
 }
 
-void DrawWelcomeScreen() {
+void DrawButton(Rectangle button, string text, Color color) {
+    /* draws a simple button
+        parameters:
+            button: position and size
+            text: button name
+            color: button color
+        returns:
+            nothing*/
+    Color background = PanelColor;
+    Color textColor = color;
 
-	Panel({ 60, 65, 880, 634 });
-	DrawBranches(500, 235, -1.5708f, 36, 5, TealBranches);
-	Center("HAPPINESS MACHINES", { 60, 256, 880, 82 }, 62, Ink);
-	Center("Can technology make us happy, or keep us wanting more?", { 60, 356, 880, 44 }, 24, Teal);
-	Center("An interactive exhibit about technology, human desires,", { 60, 424, 880, 30 }, 21, Muted);
-	Center("consumer behavior, and commercial incentives.", { 60, 456, 880, 30 }, 21, Muted);
-	DrawButton(Explore, "EXPLORE THE RESEARCH", Teal);
-	DrawLine(60, 725, 940, 725, PanelColor);
-	DrawText("TEAM 1 | CSC 103 | HACKATHON 2", 60, 750, 17, Muted);
-	const std::string credit = "Inspired by Calculating Empires";
-	DrawText(credit.c_str(), 940 - MeasureText(credit.c_str(), 17), 750, 17, Lavender);
-}
+    //change the color when the mouse is over the button
+    if (CheckCollisionPointRec(GetMousePosition(), button)) {
+        background = color;
+        textColor = Navy;
+    }
+    DrawRectangleRec(button, background);
+    DrawRectangleLinesEx(button, 2, color);
+    //center the text inside the button
+    int width = MeasureText(text.c_str(), 20);
+    int x = button.x + (button.width - width) / 2;
+    int y = button.y + (button.height - 20) / 2;
 
-void DrawResearchScreen(int slide, Texture2D image) {
-	//this function combines our several helpers to create an entire screen
-
-	//draw the header and the background
-	Header("EXPLORE THE RESEARCH", "SLIDE " + to_string(slide + 1) + " / " + to_string(ResearchSlideCount), Teal);
-	
-	//draw the main rounded card where the research content apprears
-	Panel({ 60, 108, 880, 550 });
-
-	//retrieve the slide content(defined in our Research.h file)
-	//same concept as accessing members of a class or struct in our c++ exercises from the lab
-	ResearchSlide content = GetResearchSlide(slide);
-
-	//draw the title and description using Wrap()
-	//wy 18?? because need an extra espace between the research title and the description
-	int bodyY = Wrap(content.title, 90, 142, 820, 37, Ink);
-
-	bodyY += 18;
-
-	Wrap(content.description, 90, bodyY, 810, 23, Muted);
-
-	//here im defininf the image area
-	Rectangle frame{ 90, 340, 820, 282 };
-	//frame= where the research image will appear.
-	DrawRectangleRounded(frame, 0.12f, 10, Navy);
-
-	//chek if whether the image loaded
-	if (IsTextureValid(image)) {
-		//resize the image without distorting its
-		float scale = 780.0f / image.width;
-		float heightScale = 224.0f / image.height;
-		if (heightScale < scale) {
-			scale = heightScale;
-		}
-		float w = image.width * scale;
-		float h = image.height * scale;
-		//draw the image using DrawTexturePro()
-		Rectangle source = { 0,0, (float)image.width, (float)image.height };
-		//500-w/2, 1000wide xceter = 500-> 500-400/2=300, start x=300,end x=700
-		Rectangle destination = { 500 - w / 2,463 - h / 2, w, h };
-		Vector2 origin = { 0, 0 };
-		DrawTexturePro(image, source, destination, origin, 0, WHITE);
-		Center("Existing project image", { 90, 575, 820, 40 }, 16, Muted);
-	}
-	else {
-		Center("RESEARCH IMAGE PLACEHOLDER", frame, 20, Lavender);
-	}
-	//draw the navigation buttons
-	if (slide > 0) {
-		DrawButton(Previous, "PREVIOUS", Lavender);
-	}
-	DrawButton(Home, "BACK TO HOME", Muted);
-	if (slide == ResearchSlideCount - 1) {
-		DrawButton(Next, "BEGIN EXPERIMENT", Teal);
-	}
-	else {
-		DrawButton(Next, "NEXT", Teal);
-	}
-}
-
-void DrawExperiment(Scenario scenario, int completed, int depth) {
-	//also used my beloved helper functions to make it easier
-	//Scenario is a struct defined in HappinessMachine.h -->go and check
-
-	//start drawing the header
-	string progress = "SCENARIO ";
-	progress += to_string(completed + 1);//completed count how many scenarios have already been finished
-	progress += " / ";
-	progress += to_string(ScenarioCount);
-	Header("THE DESIRE EXPERIMENT", progress, Teal);
-
-	//draw the prigress bar
-	DrawRectangleRounded({ 60, 103, 880, 9 }, 0.8f, 8, PanelColor);//full 880px
-	if (completed > 0) {
-		//880/10=88 -->88x completed
-		DrawRectangleRounded({ 60, 103, 88.0f * completed, 9 }, 0.8f, 8, Teal);//colored progress, 10scenarios
-	}
-	//scenario card
-	Panel({ 60, 130, 880, 286 });
-	//tittle of the current scenario
-	DrawText(scenario.title.c_str(), 90, 160, 38, Ink);
-
-	//draw the description of the situation
-	Wrap(scenario.situation, 90, 221, 820, 25, Muted);//thats why i decided to create this helper funcion!
-
-	//draw the two choices
-	DrawButton(FirstChoice, scenario.first, Teal);
-	DrawButton(SecondChoice, scenario.second, Lavender);
-
-	//draw the recursive tree card!!! best part
-	TreeCard(depth, 438, Teal, TealBranches);
-	//explanatory sentence
-	DrawText("Each decision changes illustrative simulation values.", 60, 708, 19, Muted);
-}
-
-void DrawOffer(string product, string pitch, int offers, int depth) {
-
-	//the machine starts with realistic situations, but eventually 
-	// begins recommending increasingly ridiculous products :D
-
-	//draw the header
-	string progress = "OFFER ";
-	progress += to_string(offers);
-	progress += " / ";
-	progress += to_string(OfferLimit);
-	Header("THE RECOMMENDATION MACHINE", progress, Lavender);
-
-	//draw the product pannel (like a backgroudn pannel)
-	Panel({ 60, 119, 880, 258 });
-
-	//shows a small heading above the recommendations
-	DrawText("FICTIONAL PRODUCT", 90, 147, 19, Lavender);
-
-
-	//draw the product name and get the next text position
-	int bodyY = Wrap(product, 90, 189, 810, 40, Ink);
-
-	//leave a small space before the description
-	bodyY += 12;
-
-	//draw the product description
-	Wrap(pitch, 90, bodyY, 810, 25, Muted);
-
-	//draw the tree
-	TreeCard(depth, 403, Lavender, LavenderBranches);//note the change in what??
-
-	//check whether the machine has reached its maximum number of offers
-	if (offers == OfferLimit) {
-		DrawButton(Next, "VIEW RESULTS", Lavender);
-	}
-	else {
-		DrawButton(Next, "ANOTHER OFFER", Lavender);
-		DrawButton(Home, "STOP AND VIEW RESULTS", Muted);
-	}
-}
-
-void DrawResults(Values scores, vector<Decision> decisions, int offers) {
-	//draw the header
-	string progress = to_string(offers);
-	progress += " FICTIONAL OFFERS VIEWED";
-	Header("EXPERIMENT RESULTS", progress, Lavender);
-
-	//draw the score panel
-	Panel({ 60, 110, 880, 138 });
-	DrawText("Illustrative simulation values", 84, 131, 26, Ink);
-
-	//score text
-	string totals = "Engagement: ";
-	totals += to_string(scores.engagement);
-
-	totals += "   Desire pressure: ";
-	totals += to_string(scores.pressure);
-
-	totals += "   Company profit: ";
-	totals += to_string(scores.profit);
-	//displays the scores
-	DrawText(totals.c_str(), 84, 171, 22, Teal);
-
-	//draw the decision history panel
-	DrawText("These totals describe the fictional system's response to your decisions.", 84, 212, 17, Muted);
-	//decision history pannel
-	Panel({ 60, 267, 880, 392 });
-	DrawText("YOUR DECISIONS", 84, 291, 20, Lavender);
-
-	//where the first decision is located
-	int y = 327;
-	int decisionCount = decisions.size();
-
-	//display every decision
-	for (int i = 0; i < decisionCount; i++) {
-		Decision decision = decisions.at(i);
-		DrawText(decision.scenario.c_str(), 84, y, 18, Ink);
-		DrawText(decision.choice.c_str(), 467, y, 18, Muted);
-		//separator
-		DrawLine(84, y + 24, 916, y + 24, Navy);
-
-		//need to move next row
-		y += 30;
-	}
-	//final buttons
-	DrawButton(Home, "BACK TO HOME", Muted);
-	DrawButton(Next, "RESTART EXPERIMENT", Teal);
+    DrawText(text.c_str(), x, y, 20, textColor);
 }
 
 int BranchCount(int depth) {
-	/*
-		counts the branches level by level
-		parameters:
-			depth: number of levels to count
-		returns:
-			the total number of visible branches segments
-	*/
-	int segments = 0;
-	int branchesAtLevel = 1;
-	for (int level = 0; level < depth; level++) {
-		segments += branchesAtLevel;
-		//every branch has two children, so the next level is twice as wide
-		branchesAtLevel *= 2;
-	}
-	return segments;
+    /*counts the number of tree branches
+        parameters:
+            depth: number of tree levels
+        returns:
+            total number of branches */
+    int total = 0;
+    int branches = 1;
+
+    for (int i = 0; i < depth; i++) {
+        total += branches;
+        branches *= 2;
+    }
+
+    return total;
+}
+//welcome screen
+void DrawWelcomeScreen() {
+
+    DrawRectangle(40, 100, 1320, 570, PanelColor);
+
+    DrawText("HAPPINESS MACHINES", 280, 225, 70, Lavender);
+
+    DrawText("technology, desires, and consumption",370, 325, 28, Teal);
+
+    DrawText("an interactive computer science experiment",360, 390, 25, Muted);
+
+    /*AI assistance: Open AI ChatGT (november 22, 2026)
+        prompted: the time for the animation appear doesnt work in my code
+        can you giveme a hint where i have the mistake?
+
+        answer: you should use gettime like this: int step = (int)(GetTime() * 2) % 3;
+
+        source: https://chatgpt.com/ */
+    //time since the application started
+    //get the time
+    float time = GetTime();
+
+    //move the words left and right
+    int x = 450 + 30 * sinf(time);
+
+    //repeat the animation every 1.5 seconds
+    int step = (int)(time * 2) % 3;
+
+    //show needs
+    if (step == 0) {
+        DrawText("NEEDS", x, 450, 25, Teal);
+    }
+    
+    //show desires after 0.5 seconds
+    if (step >= 1) {
+        DrawText("DESIRES", x, 500, 25, Lavender);
+    }
+
+    //show consumption after 1 second
+    if (step >= 2) {
+        DrawText("CONSUMPTION", x, 550, 25, Ink);
+    }
+
+    DrawTree(5);
+
+    DrawButton(Explore, "EXPLORE THE RESEARCH", Teal);
+
+    DrawText("team 1 | csc 103 | hackathon 2",40, 850, 20, Muted);
+    DrawText("Inspired by Calculating Empires", 1050, 850, 20, Muted);
+}
+//research screen
+
+void DrawResearchScreen(int slide, Texture2D image) {
+    /*displays the research title, information and image
+        parameters:
+            slide: current slide number
+            image: image for the current slide
+        returns:
+            nothing*/
+    DrawText("EXPLORE THE RESEARCH", 40, 45, 28, Teal);
+
+    string progress = "SLIDE ";
+    progress += to_string(slide + 1);
+    progress += " / ";
+    progress += to_string(ResearchSlideCount);
+
+    DrawText(progress.c_str(), 1150, 50, 22, Muted);
+
+    //left panel for the research
+    DrawRectangle(40, 110, 780, 670, PanelColor);
+
+    //right panel for the image
+    DrawRectangle(850, 110, 510, 670, PanelColor);
+
+    ResearchSlide content = GetResearchSlide(slide);
+
+    //draw the research title
+    DrawText(content.title.c_str(), 70, 145, 34, Ink);
+
+    //draw the research description
+    DrawText(content.description.c_str(), 70, 250, 23, Muted);
+
+    //display the image
+    if (IsTextureValid(image)) {
+        float scale = 470.0f / image.width;
+        float heightScale = 630.0f / image.height;
+
+        if (heightScale < scale) {
+            scale = heightScale;
+        }
+        float width = image.width * scale;
+        float height = image.height * scale;
+
+        //center the image in the right panel
+        float x = 1105 - width / 2;
+        float imageY = 445 - height / 2;
+
+        DrawTextureEx(image, { x, imageY }, 0, scale, WHITE);
+    }
+    else {
+        DrawText("IMAGE NOT FOUND", 965, 430, 25, Muted);
+    }
+
+    //navigation
+    if (slide > 0) {
+        DrawButton(Previous, "PREVIOUS", Lavender);
+    }
+    DrawButton(Home, "BACK TO HOME", Muted);
+
+    if (slide == ResearchSlideCount - 1) {
+        DrawButton(Next, "BEGIN EXPERIMENT", Teal);
+    }
+    else {
+        DrawButton(Next, "NEXT", Teal);
+    }
+}
+//experiment screen
+void DrawExperiment(Scenario scenario, int completed, int depth) {
+    /*displays a scenario and two possible choices
+        parameters:
+            scenario: current situation
+            completed: number of finished scenarios
+            depth: tree depth
+        returns:
+            nothing*/
+    DrawText("THE DESIRE EXPERIMENT", 40, 45, 28, Teal);
+
+    string progress = "SCENARIO ";
+    progress += to_string(completed + 1);
+    progress += " / ";
+    progress += to_string(ScenarioCount);
+
+    DrawText(progress.c_str(), 1100, 50, 22, Muted);
+
+    //left panel for the situation
+    DrawRectangle(40, 110, 780, 670, PanelColor);
+
+    //right panel for the tree
+    DrawRectangle(850, 110, 510, 670, PanelColor);
+
+    //draw the scenario title
+    DrawText(scenario.title.c_str(), 70, 155, 38, Ink);
+
+    //draw the scenario description
+    DrawText(scenario.situation.c_str(), 70, 260, 26, Muted);
+
+    DrawButton(FirstChoice, scenario.first, Teal);
+    DrawButton(SecondChoice, scenario.second, Lavender);
+
+    DrawText("CHOOSE ONE OPTION", 70, 425, 20, Muted);
+
+    //draw the tree on the right
+    DrawText("THE DESIRE TREE", 930, 150, 27, Lavender);
+
+    DrawTree(depth);
+
+    string stats = "depth: ";
+    stats += to_string(depth);
+    stats += " / 7";
+
+    DrawText(stats.c_str(), 995, 720, 22, Muted);
+}
+//fictional offers screen
+
+void DrawOffer(string product, string pitch, int offers, int depth) {
+    /*displays a fictional product recommendation
+        parameters:
+            product: product name
+            pitch: product description
+            offers: number of offers shown
+            depth: tree depth
+        returns:
+            nothing*/
+    DrawText("THE RECOMMENDATION MACHINE",40, 45, 28, Lavender);
+    //left panel
+    DrawRectangle(40, 110, 780, 670, PanelColor);
+    //right panel
+    DrawRectangle(850, 110, 510, 670, PanelColor);
+
+    //draw the product name
+    DrawText(product.c_str(), 70, 225, 40, Ink);
+
+    //draw the product description
+    DrawText(pitch.c_str(), 70, 310, 26, Muted);
+
+    DrawText("FICTIONAL PRODUCT", 70, 155, 22, Lavender);
+
+    DrawText("this is a fictional recommendation", 70, 580, 22, Muted);
+
+    //draw the tree
+    DrawText("THE DESIRE TREE", 930, 150, 27, Lavender);
+
+    DrawTree(depth);
+
+    //navigation
+    if (offers == OfferLimit) {
+        DrawButton(Next, "VIEW RESULTS", Lavender);
+    }
+    else {
+        DrawButton(Home, "STOP AND VIEW RESULTS", Muted);
+        DrawButton(Next, "ANOTHER OFFER", Lavender);
+    }
+}
+//results screen
+void DrawResults(Values scores, vector<Decision> decisions, int offers) {
+    /*displays the final scores and decision history
+        parameters:
+            scores: fictional experiment scores
+            decisions: choices made by the user
+            offers: number of offers viewed
+        returns:
+            nothing*/
+    DrawText("EXPERIMENT RESULTS", 40, 45, 28, Lavender);
+    //left panel for results
+    DrawRectangle(40, 110, 780, 670, PanelColor);
+    //right panel for the tree
+    DrawRectangle(850, 110, 510, 670, PanelColor);
+
+    DrawText("YOUR RESULTS", 70, 145, 30, Ink);
+
+    string engagement = "engagement: ";
+    engagement += to_string(scores.engagement);
+
+    string pressure = "desire pressure: ";
+    pressure += to_string(scores.pressure);
+
+    string profit = "company profit: ";
+    profit += to_string(scores.profit);
+
+    DrawText(engagement.c_str(), 70, 205, 23, Teal);
+    DrawText(pressure.c_str(), 70, 245, 23, Teal);
+    DrawText(profit.c_str(), 70, 285, 23, Teal);
+
+    DrawText("YOUR DECISIONS", 70, 345, 25, Lavender);
+
+    //show the choices made during the experiment
+    int y = 395;
+    for (int i = 0; i < decisions.size(); i++) {
+        Decision decision = decisions.at(i);
+
+        DrawText(decision.scenario.c_str(), 70, y, 17, Ink);
+        DrawText(decision.choice.c_str(), 440, y, 17, Muted);
+        y += 35;
+    }
+    //calculate the final tree depth
+    int depth = 1 + decisions.size() / 3 + offers;
+
+    if (depth > 7) {
+        depth = 7;
+    }
+    DrawText("FINAL DESIRE TREE", 940, 150, 27, Lavender);
+
+    DrawTree(depth);
+
+    string total = "total branches: ";
+    total += to_string(BranchCount(depth));
+
+    DrawText(total.c_str(), 965, 720, 22, Ink);
+
+    //navigation
+    DrawButton(Home, "BACK TO HOME", Muted);
+    DrawButton(Next, "RESTART EXPERIMENT", Teal);
 }
