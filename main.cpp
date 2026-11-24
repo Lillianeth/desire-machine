@@ -87,6 +87,10 @@ int main() {
             }
         }
     }
+    //load our classroom photograph
+    string classroomPath = imageDirectory + "classroom.jpg";
+    Texture2D classroomImage = LoadTexture(classroomPath.c_str());
+
     //screens
     //0 = welcome
     //1 = research
@@ -143,12 +147,11 @@ int main() {
                     currentScreen = 2;
                 }
             }
+            else if (IsButtonClicked(Skip)) {
+                machine.Start();
+                currentScreen = 2;
+            }
         }
-        if (IsButtonClicked(Skip)) {
-            machine.Start();
-            currentScreen = 2;
-        }
-
         //experiment screen
         else if (currentScreen == 2) {
 
@@ -208,17 +211,32 @@ int main() {
             if (IsButtonClicked(Home)) {
                 currentScreen = 0;
             }
+            else if (IsButtonClicked(BehindProject)) {
+                currentScreen = 6;
+            }
+        }
+        //behind the project screen
+        else if (currentScreen == 6) {
+            if (IsButtonClicked(Home)) {
+                currentScreen = 5;
+            }
         }
         //return the tree to its original color after half a second
         if (GetTime() - lastChoiceTime >= 0.5) {
             treeColor = MAGENTA;
         }
 
-
         //draw the current screen
         BeginDrawing();
 
-        ClearBackground({ 121, 101, 155, 255 });
+        //black background for the classroom photo
+        if (currentScreen == 6) {
+            ClearBackground(BLACK);
+        }
+        else {
+            //purple background for all other screens
+            ClearBackground({ 121, 101, 155, 255 });
+        }
 
         //move and enlarge the gui
         rlPushMatrix();//save
@@ -259,6 +277,9 @@ int main() {
         else if (currentScreen == 5) {
             DrawCreditsScreen();
         }
+        else if (currentScreen == 6) {
+            DrawBehindProjectScreen(classroomImage);
+        }
 
         //finish scaling the gui
         rlPopMatrix();
@@ -271,6 +292,10 @@ int main() {
         if (IsTextureValid(researchImages[i])) {
             UnloadTexture(researchImages[i]);
         }
+    }
+    //unload the classroom photograph
+    if (IsTextureValid(classroomImage)) {
+        UnloadTexture(classroomImage);
     }
     //close the window
     CloseWindow();

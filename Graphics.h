@@ -16,6 +16,7 @@ const Rectangle Previous = { 40, 810, 210, 60 };
 const Rectangle Home = { 280, 810, 260, 60 };
 const Rectangle Next = { 1100, 810, 260, 60 };
 const Rectangle Skip = { 700, 810, 300, 60 };
+const Rectangle BehindProject = { 750, 810, 300, 60 };
 
 //experiment choices
 const Rectangle FirstChoice = { 70, 470, 340, 70 };
@@ -41,5 +42,6 @@ void DrawResults(Values scores, vector<Decision> decisions, int offers);
 int BranchCount(int depth);
 
 void DrawCreditsScreen();
+void DrawBehindProjectScreen(Texture2D classroomImage);
 
 #endif

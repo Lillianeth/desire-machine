@@ -564,7 +564,7 @@ void DrawCreditsScreen() {
 
     //team members
     DrawText("Tianne Walker", 180, 505, 25, BLUE);
-    DrawText("Research, ideas, braistorming and code review.", 180, 545, 22, GREEN);
+    DrawText("Research, ideas, buttons development, braistorming and code review.", 180, 545, 22, GREEN);
 
     //inspiration
     DrawText("Inspired by Calculating Empires",180, 605, 23, SKYBLUE);
@@ -577,4 +577,40 @@ void DrawCreditsScreen() {
 
     //navigation
     DrawButton(Home, "BACK TO HOME", Teal);
+    //button to view the classroom reflection
+    DrawButton(BehindProject, "BEHIND THE PROJECT", Lavender);
+}
+
+void DrawBehindProjectScreen(Texture2D classroomImage) {
+    /*displays our classroom photograph
+        parameters:
+            classroomImage: photograph from class
+        returns:
+            nothing*/
+
+            //draw the classroom photograph
+    if (IsTextureValid(classroomImage)) {
+        //black background for the classroom photo
+        //DrawRectangle(0, 0, 1400, 900, BLACK);
+
+        float scaleX = 1200.0f / classroomImage.width;
+        float scaleY = 720.0f / classroomImage.height;
+
+        float imageScale = scaleX;
+
+        if (scaleY < scaleX) {
+            imageScale = scaleY;
+        }
+
+        float imageWidth = classroomImage.width * imageScale;
+        float imageHeight = classroomImage.height * imageScale;
+
+        //center the photograph
+        float imageX = 700 - imageWidth / 2;
+        float imageY = 430 - imageHeight / 2;
+
+        DrawTextureEx(classroomImage,{ imageX, imageY }, 0.0f, imageScale, WHITE);
+    }
+    //navigation
+    DrawButton(Home, "BACK TO CREDITS", Teal);
 }
