@@ -386,24 +386,58 @@ void DrawOffer(string product, string pitch, int offers, int depth) {
             depth: tree depth
         returns:
             nothing*/
-    DrawText("THE RECOMMENDATION MACHINE",40, 45, 28, Lavender);
+    DrawText("THE DESIRE EXPERIMENT",40, 45, 28, Teal);
     //left panel
     DrawRectangle(40, 110, 780, 670, PanelColor);
     //right panel
     DrawRectangle(850, 110, 510, 670, PanelColor);
 
+    //----------te text background, like a box-----------------
+    //draw the product card background
+    DrawRectangle(65, 205, 710, 190, { 78, 60, 110, 255 });
+    //draw the product card border
+    DrawRectangleLines(65, 205, 710, 190, Lavender);
     //draw the product name
-    DrawText(product.c_str(), 70, 225, 40, Ink);
-
+    DrawText(product.c_str(), 85, 235, 32, Ink);
     //draw the product description
-    DrawText(pitch.c_str(), 70, 310, 26, Muted);
+    DrawText(pitch.c_str(), 85, 320, 23, Muted);
 
-    DrawText("FICTIONAL PRODUCT", 70, 155, 22, Lavender);
+    //--------------------------------------------------------
 
-    DrawText("this is a fictional recommendation", 70, 580, 22, Muted);
+    DrawText("FICTIONAL PRODUCT", 70, 155, 22, BLUE);
+
+    //------------------little reflection-----------------------
+
+    //reflection about abstraction and human emotions
+    DrawText("BEHIND THE MACHINE", 70, 460, 24, BLUE);
+    DrawText("Behind this interface are algorithms and", 70, 510, 20, GREEN);
+    DrawText("decisions made by programmers.",70, 540, 20, GREEN);
+    DrawText("Our machine follows instructions. It can",70, 590, 20, GREEN);
+    DrawText("calculate scores, but it cannot understand", 70, 620, 20, GREEN);
+    DrawText("human emotions or happiness.",70, 650, 20, GREEN);
+    //final reflection about abstraction
+    DrawText("Abstraction simplifies human behavior into data,", 70, 710, 20, Lavender);
+    DrawText("but numbers cannot capture the full experience.", 70, 735, 20, Lavender);
+    //------------------------------------------------------
 
     //draw the tree
-    DrawText("THE DESIRE TREE", 930, 150, 27, Lavender);
+    DrawText("THE TREE OF POSIBILITIES", 930, 150, 27, Lavender);
+
+    //show the tree depth
+    string treeDepth = "depth: ";
+    treeDepth += to_string(depth);
+    treeDepth += " / 11";
+
+    DrawText(treeDepth.c_str(), 1050, 680, 22, Ink);
+
+    //show the number of recursive function calls
+    string calls = "recursive calls: ";
+    calls += to_string(BranchCount(depth));
+
+    DrawText(calls.c_str(), 870, 600, 19, Teal);
+
+    //show the complexity of the recursive algorithm
+    DrawText("time complexity: O ( 2^d )",1150, 600, 18, Lavender);
 
     DrawTree(depth, MAGENTA);
 
@@ -412,11 +446,13 @@ void DrawOffer(string product, string pitch, int offers, int depth) {
         DrawButton(Next, "VIEW RESULTS", Lavender);
     }
     else {
-        DrawButton(Home, "STOP AND VIEW RESULTS", Muted);
-        DrawButton(Next, "ANOTHER OFFER", RED);
+        DrawButton(Home, "STOP AND RESULTS", RED);
+        DrawButton(Next, "ANOTHER OFFER", ORANGE);
     }
 }
 //results screen
+
+    //results screen
 void DrawResults(Values scores, vector<Decision> decisions, int offers) {
     /*displays the final scores and decision history
         parameters:
@@ -430,8 +466,16 @@ void DrawResults(Values scores, vector<Decision> decisions, int offers) {
     DrawRectangle(40, 110, 780, 670, PanelColor);
     //right panel for the tree
     DrawRectangle(850, 110, 510, 670, PanelColor);
+    //box for results summary
+    DrawRectangle(70, 145, 720, 180, { 89, 70, 125, 255 });
+    DrawRectangleLines(70, 145, 720, 180, Lavender);
+    //box for decisions
+    DrawRectangle(70, 355, 720, 390, { 89, 70, 125, 255 });
+    DrawRectangleLines(70, 355, 720, 390, Lavender);
 
-    DrawText("YOUR RESULTS", 70, 145, 30, Ink);
+    //titles
+    DrawText("YOUR RESULTS:", 95, 165, 28, PINK);
+    DrawText("YOUR DECISIONS:", 95, 375, 24, PINK);
 
     string engagement = "engagement: ";
     engagement += to_string(scores.engagement);
@@ -442,20 +486,18 @@ void DrawResults(Values scores, vector<Decision> decisions, int offers) {
     string profit = "company profit: ";
     profit += to_string(scores.profit);
 
-    DrawText(engagement.c_str(), 70, 205, 23, Teal);
-    DrawText(pressure.c_str(), 70, 245, 23, Teal);
-    DrawText(profit.c_str(), 70, 285, 23, Teal);
-
-    DrawText("YOUR DECISIONS", 70, 345, 25, Lavender);
+    DrawText(engagement.c_str(), 95, 205, 23, Teal);
+    DrawText(pressure.c_str(), 95, 245, 23, Teal);
+    DrawText(profit.c_str(), 95, 285, 23, Teal);
 
     //show the choices made during the experiment
-    int y = 395;
+    int y = 425;
     for (int i = 0; i < decisions.size(); i++) {
         Decision decision = decisions.at(i);
 
-        DrawText(decision.scenario.c_str(), 70, y, 17, Ink);
-        DrawText(decision.choice.c_str(), 440, y, 17, Muted);
-        y += 35;
+        DrawText(decision.scenario.c_str(), 95, y, 17, BLUE);
+        DrawText(decision.choice.c_str(), 440, y, 17, GOLD);
+        y += 30;
     }
     //calculate the final tree depth
     //calculate the final tree depth using decisions and offers
@@ -465,16 +507,30 @@ void DrawResults(Values scores, vector<Decision> decisions, int offers) {
         depth = 11;
     }
 
-    DrawText("FINAL DESIRE TREE", 940, 150, 27, Lavender);
+    DrawText("FINAL TREE OF POSIBILITIES", 940, 150, 27, Lavender);
+    DrawTree(depth, SKYBLUE);
 
-    DrawTree(depth, MAGENTA);
+    //string total = "total branches: ";
+    //total += to_string(BranchCount(depth));
+    //----------small improvement---------------------------------
+    //show the number of recursive function calls
+    string calls = "recursive calls: ";
+    calls += to_string(BranchCount(depth));
 
-    string total = "total branches: ";
-    total += to_string(BranchCount(depth));
+    //display the recursive calls
+    DrawText(calls.c_str(), 870, 695, 20, Teal);
 
-    DrawText(total.c_str(), 965, 720, 22, Ink);
+    //display the final tree depth
+    string depthText = "depth: ";
+    depthText += to_string(depth);
+    depthText += " / 11";
+    DrawText(depthText.c_str(), 1150, 695, 20, Ink);
+
+    //show the time complexity
+    DrawText("time complexity: O ( 2^d )", 980, 745, 18, Lavender);
+    //---------------------------------------------------------------------------
 
     //navigation
-    DrawButton(Home, "BACK TO HOME", Muted);
+    DrawButton(Home, "BACK TO HOME", GREEN);
     DrawButton(Next, "RESTART EXPERIMENT", Teal);
 }

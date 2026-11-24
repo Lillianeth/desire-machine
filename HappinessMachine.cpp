@@ -169,21 +169,21 @@ void HappinessMachine::Recommend() {
          "Certified Inner Peace"}
     };
     string descriptions[OfferLimit][3] = {
-        {"suggests a routine based on your recent choices",
+        {"suggests a routine based on your \nrecent choices",
          "offers a more personalized evening",
          "recommends a daily comfort upgrade"},
 
-        {"sells a deluxe version of your next good mood",
+        {"sells a deluxe version of your next \ngood mood",
          "charges extra for the satisfying part",
-         "adds a subscription to an ordinary comfort"},
+         "adds a subscription to an ordinary \ncomfort"},
 
-        {"requires a refill whenever the good feeling wears off",
-         "charges a convenience fee for forgetting your worries",
-         "sells milestones toward a feeling you already had"},
+        {"requires a refill whenever the \ngood feeling wears off",
+         "charges a convenience fee for \nforgetting your worries",
+         "sells milestones toward a feeling \nyou already had"},
 
-        {"automatically renews whenever you feel content",
-         "charges you for the relief of canceling it",
-         "sells you a monthly exemption from its own recommendations"}
+        {"automatically renews whenever you \nfeel content",
+         "charges you for the relief of \ncanceling it",
+         "sells you a monthly exemption from \nits own recommendations"}
     };
     string modifiers[3] = {
         "Adaptive",
