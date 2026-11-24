@@ -220,9 +220,19 @@ int HappinessMachine::Depth() const {
     //i changed the depth pf the tree when starts, now it makes sence omgggg!!!!
     int depth = GetDecisionCount() * 7 / 10;
 
-    if (depth > 7) {
-        depth = 7;
+
+    //---------------testing purposes---------------------------------------
+    //im going to test what happens if i add more than 7 depths to see how it grows
+    //at depth 11 it will be like more 4k segments, the function creates two new recursive calls each time.
+    //sooo expensiveeee
+    
+    depth += offers;
+    
+    
+    if (depth > 11) {
+        depth = 11;
     }
+    //----------------------------------------------------------------
     return depth;
 }
 

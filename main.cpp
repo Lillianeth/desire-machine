@@ -143,11 +143,6 @@ int main() {
                 currentScreen = 3;
             }
         }
-        //return the tree to its original color after half a second
-        if (GetTime() - lastChoiceTime >= 0.5) {
-            treeColor = MAGENTA;
-        }
-
         //offers screen
         else if (currentScreen == 3) {
 
@@ -177,6 +172,11 @@ int main() {
                 currentScreen = 2;
             }
         }
+        //return the tree to its original color after half a second
+        if (GetTime() - lastChoiceTime >= 0.5) {
+            treeColor = MAGENTA;
+        }
+
         //draw the current screen
         BeginDrawing();
 

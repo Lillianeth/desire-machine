@@ -157,7 +157,8 @@ int BranchCount(int depth) {
     int total = 0;
     int branches = 1;
 
-    for (int i = 0; i < depth; i++) {
+    //i fixed the i< detph, wasnt calculating every iteration including 0
+    for (int i = 0; i <= depth; i++) {
         total += branches;
         branches *= 2;
     }
@@ -343,17 +344,36 @@ void DrawExperiment(Scenario scenario, int completed, int depth, Values totals, 
     stats += " / 7";
 
     DrawText(stats.c_str(), 1050, 680, 22, Muted);
+    //-------------------compexity, and recursive calls here------
+    //display the total number of recursive function calls
+    string calls = "recursive calls: ";
+    calls += to_string(BranchCount(depth));
+    DrawText(calls.c_str(), 870, 600, 19, Teal);
+
+    //show the time complexity of the recursive tree
+    DrawText("time complexity: O ( 2^d )", 1150, 600, 18, Lavender);
+    //-----------------------------------------------------------------
 
     //here im going to put the scores to try first
     //i have to add an extra parameter, because totals is not declares inside this duncion or passes to it
-    DrawText("YOUR DECISION SCORES", 70, 570, 24, RED);//engagement score
-    DrawText(TextFormat("Engagement: %d", totals.engagement),70, 625, 20, Teal);
+    //display the decision scores
+    DrawText("YOUR DECISION SCORES", 70, 570, 24, RED);
+
+    //engagement score
+    string engagement = "Engagement: ";
+    engagement += to_string(totals.engagement);
+    DrawText(engagement.c_str(), 70, 625, 20, Teal);
 
     //desire pressure score
-    DrawText(TextFormat("Desire pressure: %d", totals.pressure),70, 660, 20, Lavender);
+    string pressure = "Desire pressure: ";
+    pressure += to_string(totals.pressure);
+    DrawText(pressure.c_str(), 70, 660, 20, Lavender);
 
     //company profit score
-    DrawText(TextFormat("Company profit: %d", totals.profit),70, 695, 20, Ink);
+    string profit = "Company profit: ";
+    profit += to_string(totals.profit);
+    DrawText(profit.c_str(), 70, 695, 20, Ink);
+
 }
 //fictional offers screen
 
@@ -393,7 +413,7 @@ void DrawOffer(string product, string pitch, int offers, int depth) {
     }
     else {
         DrawButton(Home, "STOP AND VIEW RESULTS", Muted);
-        DrawButton(Next, "ANOTHER OFFER", Lavender);
+        DrawButton(Next, "ANOTHER OFFER", RED);
     }
 }
 //results screen
@@ -438,11 +458,13 @@ void DrawResults(Values scores, vector<Decision> decisions, int offers) {
         y += 35;
     }
     //calculate the final tree depth
-    int depth = 1 + decisions.size() / 3 + offers;
+    //calculate the final tree depth using decisions and offers
+    int depth = (int)decisions.size() * 7 / 10 + offers;
 
-    if (depth > 7) {
-        depth = 7;
+    if (depth > 11) {
+        depth = 11;
     }
+
     DrawText("FINAL DESIRE TREE", 940, 150, 27, Lavender);
 
     DrawTree(depth, MAGENTA);
