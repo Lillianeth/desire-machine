@@ -30,7 +30,7 @@ void DrawWelcomeScreen();
 
 void DrawResearchScreen(int slide, Texture2D image);
 
-void DrawExperiment(Scenario scenario, int completed, int depth);
+void DrawExperiment(Scenario scenario, int completed, int depth, Values totals, Color treeColor);
 
 void DrawOffer(string product, string pitch, int offers, int depth);
 

@@ -37,7 +37,7 @@ const float branchDecay = 0.66f;
 const float branchAngle = 50.0f * DEG2RAD;
 
 //draws the branches using recursion
-void drawBranch(Branch branch, int currentDepth, int targetDepth) {
+void drawBranch(Branch branch, int currentDepth, int targetDepth, Color treeColor) {
     /*draws a fractal tree using recursion
         parameters:
             branch: current branch
@@ -46,7 +46,7 @@ void drawBranch(Branch branch, int currentDepth, int targetDepth) {
         returns:
             nothing*/
     //draw the current branch
-    DrawLineEx(branch.start, branch.end, 2.0f, MAGENTA);
+    DrawLineEx(branch.start, branch.end, 2.0f, treeColor);
     // asked gemini: "how does drawlineex work in Raylib?"
     //base case
     if (currentDepth >= targetDepth) {
@@ -54,7 +54,7 @@ void drawBranch(Branch branch, int currentDepth, int targetDepth) {
     }
     //calculate the next branch length
     float nextLength = branch.length * branchDecay;
-
+   
     //left branch
     float angle1 = branch.angle + branchAngle;
 
@@ -80,12 +80,12 @@ void drawBranch(Branch branch, int currentDepth, int targetDepth) {
         branch.end.y - nextLength * cosf(angle2)
     };
     //recursive calls
-    drawBranch(leftBranch, currentDepth + 1, targetDepth);
-    drawBranch(rightBranch, currentDepth + 1, targetDepth);
+    drawBranch(leftBranch, currentDepth + 1, targetDepth, treeColor);
+    drawBranch(rightBranch, currentDepth + 1, targetDepth, treeColor);
 }
 
 //draws the tree inside the right panel
-void DrawTree(int depth) {
+void DrawTree(int depth, Color treeColor) {
     /*creates the first branch and draws the entire tree
         parameters:
             depth: number of generations
@@ -93,7 +93,7 @@ void DrawTree(int depth) {
             nothing*/
     Branch root;
     //start near the bottom of the right panel
-    root.start = { 1105, 690 };
+    root.start = { 1105, 650 };
     root.angle = 0.0f;
     root.length = 145.0f;
 
@@ -104,7 +104,7 @@ void DrawTree(int depth) {
     }; // prompted gemini: "what is this formula doing: ...?"
 
     //draw the tree
-    drawBranch(root, 0, depth);
+    drawBranch(root, 0, depth, treeColor);
 }
 
 //helper functions
@@ -207,7 +207,7 @@ void DrawWelcomeScreen() {
         DrawText("CONSUMPTION", x, 550, 25, Ink);
     }
 
-    DrawTree(5);
+    DrawTree(5, MAGENTA);
 
     DrawButton(Explore, "EXPLORE THE RESEARCH", Teal);
 
@@ -281,7 +281,7 @@ void DrawResearchScreen(int slide, Texture2D image) {
     }
 }
 //experiment screen
-void DrawExperiment(Scenario scenario, int completed, int depth) {
+void DrawExperiment(Scenario scenario, int completed, int depth, Values totals, Color treeColor) {//new parmtr added (remember later change the main)
     /*displays a scenario and two possible choices
         parameters:
             scenario: current situation
@@ -307,24 +307,53 @@ void DrawExperiment(Scenario scenario, int completed, int depth) {
     //draw the scenario title
     DrawText(scenario.title.c_str(), 70, 155, 38, Ink);
 
+    //draw the scenario description----------------------------
+    //draw the scenario title
+    DrawText(scenario.title.c_str(), 70, 155, 38, Ink);
+
+    //label for the situation
+    DrawText("CURRENT OFFER", 70, 215, 20, BLUE);
+
+    //draw a box for the situation text
+    DrawRectangle(70, 245, 700, 130, { 78, 60, 110, 255 });
+    DrawRectangleLines(70, 245, 700, 130, Muted);
+
     //draw the scenario description
-    DrawText(scenario.situation.c_str(), 70, 260, 26, Muted);
+    DrawText(scenario.situation.c_str(), 90, 275, 26, Muted);
+    //----------------------------------------------------------
 
     DrawButton(FirstChoice, scenario.first, Teal);
     DrawButton(SecondChoice, scenario.second, Lavender);
 
-    DrawText("CHOOSE ONE OPTION", 70, 425, 20, Muted);
+    DrawText("CHOOSE ONE OPTION", 70, 425, 20, BLUE);
 
     //draw the tree on the right
-    DrawText("THE DESIRE TREE", 930, 150, 27, Lavender);
+    DrawText("THE TREE OF POSIBILITIES", 930, 150, 27, ORANGE);
 
-    DrawTree(depth);
+    DrawTree(depth, treeColor);
+
+    //explain what the recursive tree represents
+    //explain the purpose of the recursive tree
+    DrawText("A recursive visualization of expanding",910, 730, 20, YELLOW);
+
+    DrawText("possibilities, not personal predictions.",910, 755, 20, YELLOW);
 
     string stats = "depth: ";
     stats += to_string(depth);
     stats += " / 7";
 
-    DrawText(stats.c_str(), 995, 720, 22, Muted);
+    DrawText(stats.c_str(), 1050, 680, 22, Muted);
+
+    //here im going to put the scores to try first
+    //i have to add an extra parameter, because totals is not declares inside this duncion or passes to it
+    DrawText("YOUR DECISION SCORES", 70, 570, 24, RED);//engagement score
+    DrawText(TextFormat("Engagement: %d", totals.engagement),70, 625, 20, Teal);
+
+    //desire pressure score
+    DrawText(TextFormat("Desire pressure: %d", totals.pressure),70, 660, 20, Lavender);
+
+    //company profit score
+    DrawText(TextFormat("Company profit: %d", totals.profit),70, 695, 20, Ink);
 }
 //fictional offers screen
 
@@ -356,7 +385,7 @@ void DrawOffer(string product, string pitch, int offers, int depth) {
     //draw the tree
     DrawText("THE DESIRE TREE", 930, 150, 27, Lavender);
 
-    DrawTree(depth);
+    DrawTree(depth, MAGENTA);
 
     //navigation
     if (offers == OfferLimit) {
@@ -416,7 +445,7 @@ void DrawResults(Values scores, vector<Decision> decisions, int offers) {
     }
     DrawText("FINAL DESIRE TREE", 940, 150, 27, Lavender);
 
-    DrawTree(depth);
+    DrawTree(depth, MAGENTA);
 
     string total = "total branches: ";
     total += to_string(BranchCount(depth));

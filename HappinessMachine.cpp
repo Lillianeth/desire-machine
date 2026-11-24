@@ -7,7 +7,7 @@ const Scenario scenarios[ScenarioCount] = {
 
     {"Visibility for sale",
      "Your posts are getting less engagement.\n"
-     "The platform offers a paid boost to reach more people.",
+     "The platform offers a paid boost to reach \nmore people.",
      "Buy a profile boost",
      "Keep your usual reach",
      {3, 2, 3}, {0, -1, 0}},
@@ -20,21 +20,21 @@ const Scenario scenarios[ScenarioCount] = {
      {2, 1, 3}, {-1, -1, 0}},
 
     {"The streak",
-     "Your fitness app offers a paid streak freeze\n"
+     "Your fitness app offers a paid streak \nfreeze\n"
      "when you take a rest day.",
      "Protect the streak",
      "Take the rest day",
      {2, 2, 2}, {0, -2, 0}},
 
     {"Dinner within reach",
-     "A delivery app remembers your favorite meal\n"
+     "A delivery app remembers your favorite \nmeal\n"
      "and sends a discount just before dinner.",
      "Use the timed discount",
      "Cook what you have",
      {2, 1, 2}, {0, -1, 0}},
 
     {"A gift for later",
-     "A shopping app offers a discount on a gift\n"
+     "A shopping app offers a discount on a \ngift\n"
      "if you enable future birthday reminders.",
      "Enable gift reminders",
      "Set a calendar reminder",
@@ -48,28 +48,28 @@ const Scenario scenarios[ScenarioCount] = {
      {3, 2, 1}, {-1, -2, 0}},
 
     {"The better seat",
-     "A ticket site offers an upgrade after showing\n"
+     "A ticket site offers an upgrade after \nshowing\n"
      "where your friends will be sitting.",
      "Pay to sit closer",
      "Keep your original seat",
      {1, 2, 3}, {0, -1, 0}},
 
     {"A focus upgrade",
-     "Your productivity app offers a premium dashboard\n"
-     "that compares your focus time to other users.",
+     "Your productivity app offers a premium \ndashboard\n"
+     "that compares your focus time to other \nusers.",
      "Try the comparison plan",
      "Use the basic timer",
      {2, 3, 2}, {1, -1, 0}},
 
     {"Almost yours",
-     "A store offers free shipping if you add\n"
+     "A store offers free shipping if you \nadd\n"
      "another item to your shopping cart.",
      "Add a small extra item",
      "Pay for shipping only",
      {2, 2, 3}, {0, 0, 1}},
 
     {"A warmer welcome",
-     "A multiplayer game offers a paid celebration\n"
+     "A multiplayer game offers a paid \ncelebration\n"
      "animation for welcoming a new teammate.",
      "Buy the celebration",
      "Welcome them in chat",
@@ -215,8 +215,10 @@ int HappinessMachine::Depth() const {
         parameters:
             none
         returns:
-            tree depth from 1 to 7*/
-    int depth = 1 + GetDecisionCount() / 3 + offers;
+            tree depth from 0 to 7*/
+
+    //i changed the depth pf the tree when starts, now it makes sence omgggg!!!!
+    int depth = GetDecisionCount() * 7 / 10;
 
     if (depth > 7) {
         depth = 7;

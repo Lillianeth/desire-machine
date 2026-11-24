@@ -76,6 +76,12 @@ int main() {
     int currentScreen = 0;
     int slide = 0;
 
+    //when the player made a decision
+    double lastChoiceTime = -10.0;
+
+    //which color the tree should use?
+    Color treeColor = MAGENTA;
+
     //create the happiness machine object
     HappinessMachine machine;
 
@@ -84,6 +90,7 @@ int main() {
 
         //welcome screen
         if (currentScreen == 0) {
+            cout << "Youre in screen 0";
 
             if (IsButtonClicked(Explore)) {
                 slide = 0;
@@ -117,11 +124,17 @@ int main() {
             //first choice
             if (IsButtonClicked(FirstChoice)) {
                 machine.Choose(true);
+
+                lastChoiceTime = GetTime();
+                treeColor = LIME;
             }
 
             //second choice
             else if (IsButtonClicked(SecondChoice)) {
                 machine.Choose(false);
+
+                lastChoiceTime = GetTime();
+                treeColor = SKYBLUE;
             }
 
             //start the offers after ten decisions
@@ -129,6 +142,10 @@ int main() {
                 machine.Recommend();
                 currentScreen = 3;
             }
+        }
+        //return the tree to its original color after half a second
+        if (GetTime() - lastChoiceTime >= 0.5) {
+            treeColor = MAGENTA;
         }
 
         //offers screen
@@ -181,7 +198,9 @@ int main() {
             DrawExperiment(
                 machine.GetCurrentScenario(),
                 machine.GetDecisionCount(),
-                machine.Depth()
+                machine.Depth(),
+                machine.GetTotals(),
+                treeColor//omg!! 
             );
         }
         else if (currentScreen == 3) {
