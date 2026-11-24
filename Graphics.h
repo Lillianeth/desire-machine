@@ -15,6 +15,7 @@ const Rectangle Credits = { 920, 710, 180, 65 };
 const Rectangle Previous = { 40, 810, 210, 60 };
 const Rectangle Home = { 280, 810, 260, 60 };
 const Rectangle Next = { 1100, 810, 260, 60 };
+const Rectangle Skip = { 700, 810, 300, 60 };
 
 //experiment choices
 const Rectangle FirstChoice = { 70, 470, 340, 70 };

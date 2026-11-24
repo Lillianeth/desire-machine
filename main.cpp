@@ -144,6 +144,10 @@ int main() {
                 }
             }
         }
+        if (IsButtonClicked(Skip)) {
+            machine.Start();
+            currentScreen = 2;
+        }
 
         //experiment screen
         else if (currentScreen == 2) {

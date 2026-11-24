@@ -281,6 +281,7 @@ void DrawResearchScreen(int slide, Texture2D image) {
         DrawButton(Next, "BEGIN EXPERIMENT", Teal);
     }
     else {
+        DrawButton(Skip, "SKIP", Teal);
         DrawButton(Next, "NEXT", Teal);
     }
 }
