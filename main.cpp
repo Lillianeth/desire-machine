@@ -93,14 +93,19 @@ int main() {
             cout << "Youre in screen 0";
 
             if (IsButtonClicked(Explore)) {
+                cout << "Explore clicked...";
                 slide = 0;
                 currentScreen = 1;
+            }
+            else if (IsButtonClicked(Credits)) {
+                currentScreen = 5;
             }
         }
         //research screen
         else if (currentScreen == 1) {
 
             if (IsButtonClicked(Home)) {
+                cout << "Home clicked...";
                 currentScreen = 0;
             }
             else if (IsButtonClicked(Previous) && slide > 0) {
@@ -172,10 +177,17 @@ int main() {
                 currentScreen = 2;
             }
         }
+        //credits screen
+        else if (currentScreen == 5) {
+            if (IsButtonClicked(Home)) {
+                currentScreen = 0;
+            }
+        }
         //return the tree to its original color after half a second
         if (GetTime() - lastChoiceTime >= 0.5) {
             treeColor = MAGENTA;
         }
+
 
         //draw the current screen
         BeginDrawing();
@@ -217,6 +229,9 @@ int main() {
                 machine.GetDecisions(),
                 machine.GetOfferCount()
             );
+        }
+        else if (currentScreen == 5) {
+            DrawCreditsScreen();
         }
 
         //finish scaling the gui

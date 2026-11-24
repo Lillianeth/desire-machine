@@ -11,6 +11,8 @@ using namespace std;
 
 //button positions
 const Rectangle Explore = { 500, 710, 400, 65 };
+//button to open the credits screen
+const Rectangle Credits = { 920, 710, 180, 65 };
 const Rectangle Previous = { 40, 810, 210, 60 };
 const Rectangle Home = { 280, 810, 260, 60 };
 const Rectangle Next = { 1100, 810, 260, 60 };
@@ -38,5 +40,7 @@ void DrawResults(Values scores, vector<Decision> decisions, int offers);
 
 //tree statistics
 int BranchCount(int depth);
+
+void DrawCreditsScreen();
 
 #endif

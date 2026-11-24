@@ -211,6 +211,8 @@ void DrawWelcomeScreen() {
     DrawTree(5, MAGENTA);
 
     DrawButton(Explore, "EXPLORE THE RESEARCH", Teal);
+    //button to view the project credits
+    DrawButton(Credits, "CREDITS", LIME);
 
     DrawText("team 1 | csc 103 | hackathon 2",40, 850, 20, Muted);
     DrawText("Inspired by Calculating Empires", 1050, 850, 20, Muted);
@@ -533,4 +535,44 @@ void DrawResults(Values scores, vector<Decision> decisions, int offers) {
     //navigation
     DrawButton(Home, "BACK TO HOME", GREEN);
     DrawButton(Next, "RESTART EXPERIMENT", Teal);
+}
+
+
+void DrawCreditsScreen() {
+    /*displays the project credits and contributions
+        parameters:
+            none
+        returns:
+            nothing*/
+    DrawText("PROJECT CREDITS", 40, 45, 28, Teal);
+    //main credits panel
+    DrawRectangle(120, 110, 1160, 670, PanelColor);
+
+    //project title
+    DrawText("HAPPINESS MACHINES", 390, 145, 45, ORANGE);
+    DrawText("TEAM 1 | CSC 103 | HACKATHON 2", 450, 205, 22, Teal);
+
+    //project development
+    DrawText("Lillianeth Rivas", 180, 275, 25, BLUE);
+    DrawText("Research, application development, interface design and integration.", 180, 315, 25, GREEN);
+
+    //recursive tree contribution
+    DrawText("Melvin Sch", 180, 405, 25, BLUE);
+    DrawText("Fractal tree development and recursion, code polishing, and  research.", 180, 435, 25, GREEN);
+
+    //team members
+    DrawText("Tianne Walker", 180, 505, 25, BLUE);
+    DrawText("Research, ideas, braistorming and code review.", 180, 545, 22, GREEN);
+
+    //inspiration
+    DrawText("Inspired by Calculating Empires",180, 605, 23, SKYBLUE);
+    DrawText("Kate Crawford & Vladan Joler (2023)",180, 638, 20, SKYBLUE);
+    DrawText("Developed using C++ and raylib",180, 670, 20, SKYBLUE);
+
+    //final reflection
+    DrawText("\"Behind every interface are human decisions, assumptions, and lines of code.\"", 180, 725, 26, Lavender);
+
+
+    //navigation
+    DrawButton(Home, "BACK TO HOME", Teal);
 }
