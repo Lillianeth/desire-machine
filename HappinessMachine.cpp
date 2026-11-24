@@ -110,7 +110,7 @@ Scenario HappinessMachine::GetCurrentScenario() const {
             a scenario*/
     int position = GetDecisionCount();
     if (position >= order.size()) {
-        return {};
+        return Scenario{};
     }
     int index = order.at(position);
     return scenarios[index];
@@ -131,7 +131,6 @@ void HappinessMachine::Choose(bool first) {
     Decision decision;
 
     decision.scenario = scenario.title;
-
     
     if (first) {//check which option was selected
         decision.choice = scenario.first;
@@ -141,7 +140,6 @@ void HappinessMachine::Choose(bool first) {
         decision.choice = scenario.second;
         decision.effect = scenario.secondEffect;
     }
-    //save the decision
     decisions.push_back(decision);
 
     //update the fictional scores

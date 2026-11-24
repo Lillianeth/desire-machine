@@ -11,7 +11,6 @@ using namespace std;
 
 //button positions
 const Rectangle Explore = { 500, 710, 400, 65 };
-//button to open the credits screen
 const Rectangle Credits = { 920, 710, 180, 65 };
 const Rectangle Previous = { 40, 810, 210, 60 };
 const Rectangle Home = { 280, 810, 260, 60 };
@@ -20,7 +19,6 @@ const Rectangle Next = { 1100, 810, 260, 60 };
 //experiment choices
 const Rectangle FirstChoice = { 70, 470, 340, 70 };
 const Rectangle SecondChoice = { 440, 470, 340, 70 };
-
 
 //helper functions
 bool IsButtonClicked(Rectangle button);

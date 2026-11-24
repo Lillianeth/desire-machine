@@ -13,6 +13,14 @@ int main() {
     //create the window
     InitWindow(gameWidth, gameHeight, "Happiness Machines");
 
+    /*Source: raylib official example: core_window_flags.c
+
+    I consulted this example to understand how raylib handles fullscreen windows using ToggleFullscreen().
+
+    Reference:
+    Santamaria, R. (2020-2025). raylib:  core_window_flags.c
+    https://github.com/raysan5/raylib/blob/master/examples/core/core_window_flags.c */
+
     //get the monitor resolution
     int screenWidth = GetMonitorWidth(0);
     int screenHeight = GetMonitorHeight(0);
@@ -20,8 +28,19 @@ int main() {
     //make the window fullscreen
     SetWindowSize(screenWidth, screenHeight);
     ToggleFullscreen();
-
     SetTargetFPS(60);
+    //---------------------------------------------------------------------
+     /* Source: raylib official window letterbox example
+
+     I used this example as a reference for understanding how to scale a virtual game resolution while keeping
+     the original proportions.
+
+     The example also explains how mouse coordinates must be adjusted when the displayed game is scaled.
+
+     Reference:
+     Anata & Ramon Santamaria. (2019-2025).
+     raylib: core_window_letterbox.c
+     https://github.com/raysan5/raylib/blob/master/examples/core/core_window_letterbox.c */
 
     //calculate how much we need to enlarge the gui
     float scaleX = (float)GetScreenWidth() / gameWidth;
@@ -41,6 +60,8 @@ int main() {
     //adjust the mouse coordinates for the new size
     SetMouseOffset(-offsetX, -offsetY);
     SetMouseScale(1.0f / scale, 1.0f / scale);
+    //----------------------------------------------------------------------
+
 
     //load the research images
     Texture2D researchImages[ResearchSlideCount] = {};
@@ -72,6 +93,7 @@ int main() {
     //2 = experiment
     //3 = offers
     //4 = results
+    //5 = credits
 
     int currentScreen = 0;
     int slide = 0;
@@ -195,9 +217,9 @@ int main() {
         ClearBackground({ 121, 101, 155, 255 });
 
         //move and enlarge the gui
-        rlPushMatrix();
-        rlTranslatef(offsetX, offsetY, 0);
-        rlScalef(scale, scale, 1.0f);
+        rlPushMatrix();//save
+        rlTranslatef(offsetX, offsetY, 0);//move the gui
+        rlScalef(scale, scale, 1.0f);//resize
 
 
         if (currentScreen == 0) {

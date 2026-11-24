@@ -165,6 +165,7 @@ int BranchCount(int depth) {
 
     return total;
 }
+
 //welcome screen
 void DrawWelcomeScreen() {
 
@@ -217,8 +218,8 @@ void DrawWelcomeScreen() {
     DrawText("team 1 | csc 103 | hackathon 2",40, 850, 20, Muted);
     DrawText("Inspired by Calculating Empires", 1050, 850, 20, Muted);
 }
-//research screen
 
+//research screen
 void DrawResearchScreen(int slide, Texture2D image) {
     /*displays the research title, information and image
         parameters:
@@ -283,6 +284,7 @@ void DrawResearchScreen(int slide, Texture2D image) {
         DrawButton(Next, "NEXT", Teal);
     }
 }
+
 //experiment screen
 void DrawExperiment(Scenario scenario, int completed, int depth, Values totals, Color treeColor) {//new parmtr added (remember later change the main)
     /*displays a scenario and two possible choices
@@ -377,8 +379,8 @@ void DrawExperiment(Scenario scenario, int completed, int depth, Values totals, 
     DrawText(profit.c_str(), 70, 695, 20, Ink);
 
 }
-//fictional offers screen
 
+//fictional offers screen
 void DrawOffer(string product, string pitch, int offers, int depth) {
     /*displays a fictional product recommendation
         parameters:
@@ -452,9 +454,8 @@ void DrawOffer(string product, string pitch, int offers, int depth) {
         DrawButton(Next, "ANOTHER OFFER", ORANGE);
     }
 }
-//results screen
 
-    //results screen
+//results screen
 void DrawResults(Values scores, vector<Decision> decisions, int offers) {
     /*displays the final scores and decision history
         parameters:
@@ -554,11 +555,11 @@ void DrawCreditsScreen() {
 
     //project development
     DrawText("Lillianeth Rivas", 180, 275, 25, BLUE);
-    DrawText("Research, application development, interface design and integration.", 180, 315, 25, GREEN);
+    DrawText("Research, application development, documentation, interface design and integration.", 180, 315, 25, GREEN);
 
     //recursive tree contribution
     DrawText("Melvin Sch", 180, 405, 25, BLUE);
-    DrawText("Fractal tree development and recursion, code polishing, and  research.", 180, 435, 25, GREEN);
+    DrawText("Fractal tree development and recursion, code polishing, design, and  research.", 180, 435, 25, GREEN);
 
     //team members
     DrawText("Tianne Walker", 180, 505, 25, BLUE);

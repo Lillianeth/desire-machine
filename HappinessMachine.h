@@ -52,6 +52,8 @@ public:
     Values GetTotals() const;
     vector<Decision> GetDecisions() const;
 
+
+
 private:
     vector<int> order;
     vector<Decision> decisions;
@@ -62,5 +64,18 @@ private:
     string product;
     string pitch;
 };
+/*AI assistance: OpenAI ChatGPT (November 2026)
+    Prompted:
+    "If I cant use pointers or references, How can I store multiple decisions using vectors
+    and return information from my class without them?"
 
+    Answer:
+    ChatGPT explained that a vector can store multiple decision objects and that getter functions can return
+    values or copies instead of pointers or references.
+    For example, vector<Decision> GetDecisions() const returns a copy of the stored decisions.
+
+    Source:
+    OpenAI. (2026). ChatGPT [Large language model].*/
 #endif
+
+    
